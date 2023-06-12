@@ -72,8 +72,8 @@ def chars_to_onehot(text: str, char_to_idx: dict) -> Tensor:
     result = torch.zeros((N,D), dtype = torch.int8)
     # for each of the letter positions (which corresponds to rows of result tensor)
     # fill the row which the one-hot incoding of the letter, i.e fill 1 in its idx coloumn
-    for pos, letter in enumerate(text): 
-        result[pos ,char_to_idx[letter]] = 1
+    indices = torch.tensor([char_to_idx[letter] for letter in text], dtype=torch.long)
+    result = torch.nn.functional.one_hot(indices, num_classes=D).to(torch.int8)
     # ========================
     return result
 
@@ -91,8 +91,6 @@ def onehot_to_chars(embedded_text: Tensor, idx_to_char: dict) -> str:
     # TODO: Implement the reverse-embedding.
     # ====== YOUR CODE: ======
     N,D = embedded_text.shape
-    assert(torch.allclose(embedded_text.sum(dim = 1,dtype = torch.int8),torch.ones((N,),dtype = torch.int8)))
-
     idxs = torch.argmax(embedded_text, dim = 1).tolist()
     result = "".join([idx_to_char[idx] for idx in idxs])
     
@@ -124,7 +122,20 @@ def chars_to_labelled_samples(text: str, char_to_idx: dict, seq_len: int, device
     #  3. Create the labels tensor in a similar way and convert to indices.
     #  Note that no explicit loops are required to implement this function.
     # ====== YOUR CODE: ======
-    raise NotImplementedError()
+    embedded_text = chars_to_onehot(text, char_to_idx)
+    samples_tuple = torch.split(embedded_text[:-1], seq_len)
+
+    indices = torch.tensor([char_to_idx[letter] for letter in text], dtype=torch.long)
+    labels_tuple = torch.split(indices[1:], seq_len)
+    
+    if samples_tuple[-1].shape != samples_tuple[-2].shape:
+        samples_tuple = samples_tuple[:-1]
+        labels_tuple = labels_tuple[:-1]
+        
+    assert len(samples_tuple) == len(labels_tuple)
+    samples = torch.stack(samples_tuple ,dim = 0).to(device)
+    labels = torch.stack(labels_tuple ,dim = 0).to(device)
+
     # ========================
     return samples, labels
 
@@ -209,7 +220,22 @@ class SequenceBatchSampler(torch.utils.data.Sampler):
         #  you can drop it.
         idx = None  # idx should be a 1-d list of indices.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        # dataset contains pairs (sample,label) each sample of seq_len length, also each label
+        
+        # naive: return list(range(len(dataset))) so if batchsize is 4 then we get [1,2,3,4], [5,6,7,8] ... but 5 does not continue 1
+        
+        # try 2: want [0,a,2a,3a], [1,1+a,1+2a,1+3a], [2,2+a,2+2a,2+3a], ..., [a-1, 2a-1, 3a-1, 4a-1]
+        # when a is len(dataset) // batchsize 
+        # what happens when dataset does not divide by batchsize?
+        # we still get samples up to 4a-1. say we really got samples to 4a+2 last batch is thrown which means we also dont see 3a+2
+
+        a = len(self.dataset) // self.batch_size
+        first_batch = torch.tensor([i*a for i in range(self.batch_size)], dtype = torch.long)
+
+        idx = []
+        for j in range(a):
+            idx += (first_batch + j).tolist()
+
         # ========================
         return iter(idx)
 
