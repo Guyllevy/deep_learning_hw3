@@ -282,7 +282,29 @@ class MultilayerGRU(nn.Module):
         #      then call self.register_parameter() on them. Also make
         #      sure to initialize them. See functions in torch.nn.init.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        assert dropout < 1
+        self.dropout = dropout
+        
+        for k in range(n_layers):
+            if k == 0:
+                in_dim = self.in_dim
+            else:
+                in_dim = self.h_dim
+                
+            extend =   [nn.Linear(in_dim, self.h_dim, bias = False), #Wxz
+                        nn.Linear(self.h_dim, self.h_dim, bias = True), # Whz
+                        nn.Linear(in_dim, self.h_dim, bias = False), # Wxr
+                        nn.Linear(self.h_dim, self.h_dim, bias = True), # Whr
+                        nn.Linear(in_dim, self.h_dim, bias = False), # Wxg
+                        nn.Linear(self.h_dim, self.h_dim, bias = True), # Whg
+                       ]
+            
+            names = ["Wxz", "Whz", "Wxr", "Whr", "Wxg", "Whg"]
+            for i, module in enumerate(extend):
+                self.add_module("m_l" +str(k) + "_" + names[i] ,module)
+                self.layer_params.append(module)
+
+        self.Why = nn.Linear(h_dim, out_dim, bias = True)
         # ========================
 
     def forward(self, input: Tensor, hidden_state: Tensor = None):
@@ -320,6 +342,39 @@ class MultilayerGRU(nn.Module):
         #  Tip: You can use torch.stack() to combine multiple tensors into a
         #  single tensor in a differentiable manner.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        h = layer_states # readable naming for layer_states in the calcs to come
+        FinalLayerHsList = []
+        
+        for t in range(seq_len):
+            
+            for k in range(self.n_layers):
+                
+                Wxz, Whz, Wxr, Whr, Wxg, Whg = self.layer_params[6*k : 6*(k+1)]
+
+                # xk is the input from previous layer
+                if k == 0:
+                    xk = input[:,t,:] # (B,V)
+                else:
+                    if self.dropout == 0:
+                        xk = h[k-1] # (B,H)
+                    else:
+                        xk = nn.functional.dropout(h[k-1], self.dropout)
+
+                # h[k] is the input from the previous time step
+                zk = torch.sigmoid(Wxz(xk) + Whz(h[k]))
+                rk = torch.sigmoid(Wxr(xk) + Whr(h[k]))
+                gk = torch.tanh(Wxg(xk) + Whg(rk * h[k]))
+                h[k] = (zk * h[k]) + (1-zk) * gk # update hidden state for next time step
+
+            FinalLayerHsList.append(h[-1]) # each h[-1] is of shape (B,H)
+
+        # FinalLayerHsList[0] shape is (B,H) so stacking FinalLayerHsList in dim = 1 results in shape (B,S,H)
+        FinalLayerHs = torch.stack(FinalLayerHsList, dim = 1)
+
+        layer_output = self.Why(FinalLayerHs) #  (B,S,H) --->  (B,S,O)
+        
+        # layer_states[0] shape is (B,H) so stacking layer_states in dim = 1 results in shape (B,L,H)
+        hidden_state = torch.stack(layer_states, dim = 1)
+        
         # ========================
         return layer_output, hidden_state
