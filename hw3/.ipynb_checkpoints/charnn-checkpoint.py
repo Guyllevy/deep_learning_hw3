@@ -151,7 +151,7 @@ def hot_softmax(y, dim=0, temperature=1.0):
     """
     # TODO: Implement based on the above.
     # ====== YOUR CODE: ======
-    raise NotImplementedError()
+    result = torch.exp(y/temperature) / torch.exp(y/temperature).sum(dim = dim)
     # ========================
     return result
 
@@ -187,7 +187,24 @@ def generate_from_model(model, start_sequence, n_chars, char_maps, T):
     #  necessary for this. Best to disable tracking for speed.
     #  See torch.no_grad().
     # ====== YOUR CODE: ======
-    raise NotImplementedError()
+    char_to_idx, idx_to_char = char_maps
+
+    # feeding model with start seuence
+    x0 = chars_to_onehot(start_sequence, char_to_idx).unsqueeze(dim = 0).to(device)
+    y, h_s = model(x0) # result which contains scores to predict next char, and the model state
+
+    while len(out_text) < n_chars:
+
+        # calculate distribution and sample char.
+        probabilities = hot_softmax(y[:,-1,:], dim = -1, temperature = T)
+        new_char_idx = torch.multinomial(probabilities, 1)[0,0].item()
+        new_char = idx_to_char[new_char_idx]
+        out_text += new_char
+
+        # we have all the previous state, so we feed the model just the next char as a sequence and fetch the resulted scores and new state.
+        char_embd = chars_to_onehot(new_char, char_to_idx).unsqueeze(dim = 0).to(device)
+        y, h_s = model(char_embd, h_s)
+    
     # ========================
 
     return out_text
@@ -344,6 +361,7 @@ class MultilayerGRU(nn.Module):
         # ====== YOUR CODE: ======
         h = layer_states # readable naming for layer_states in the calcs to come
         FinalLayerHsList = []
+        input = input.to(torch.float32)
         
         for t in range(seq_len):
             
