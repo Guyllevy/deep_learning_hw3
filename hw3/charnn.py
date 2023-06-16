@@ -151,7 +151,7 @@ def hot_softmax(y, dim=0, temperature=1.0):
     """
     # TODO: Implement based on the above.
     # ====== YOUR CODE: ======
-    result = torch.exp(y/temperature) / torch.exp(y/temperature).sum(dim = dim)
+    result = nn.functional.softmax(y/temperature, dim=dim)
     # ========================
     return result
 
