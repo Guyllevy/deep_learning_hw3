@@ -40,7 +40,7 @@ def part1_generation_params():
     # TODO: Tweak the parameters to generate a literary masterpiece.
     # ====== YOUR CODE: ======
     start_seq = "MASTERPIECE."
-    temperature = 0.5
+    temperature = 0.4
     # ========================
     return start_seq, temperature
 

@@ -23,7 +23,7 @@ def char_maps(text: str):
     #  It's best if you also sort the chars before assigning indices, so that
     #  they're in lexical order.
     # ====== YOUR CODE: ======
-    chars = set(list(text))
+    chars = sorted(list(set(text)))
     idx_to_char = {i:c for i,c in enumerate(chars)}
     char_to_idx = {idx_to_char[i]:i for i in idx_to_char.keys()}
     # ========================
@@ -188,8 +188,8 @@ def generate_from_model(model, start_sequence, n_chars, char_maps, T):
     #  See torch.no_grad().
     # ====== YOUR CODE: ======
     char_to_idx, idx_to_char = char_maps
-    model.train(False)
 
+    model.eval()
     # feeding model with start seuence
     x0 = chars_to_onehot(start_sequence, char_to_idx).unsqueeze(dim = 0).to(device)
     y, h_s = model(x0) # result which contains scores to predict next char, and the model state
