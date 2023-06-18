@@ -1,1 +1,94 @@
 [NbConvertApp] Converting notebook Part1_Sequence.ipynb to notebook
+Traceback (most recent call last):
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/bin/jupyter-nbconvert", line 10, in <module>
+    sys.exit(main())
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/jupyter_core/application.py", line 277, in launch_instance
+    return super().launch_instance(argv=argv, **kwargs)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/traitlets/config/application.py", line 1043, in launch_instance
+    app.start()
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/nbconvertapp.py", line 414, in start
+    self.convert_notebooks()
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/nbconvertapp.py", line 589, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/nbconvertapp.py", line 555, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/nbconvertapp.py", line 481, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/exporters/exporter.py", line 352, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/preprocessors/execute.py", line 100, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/preprocessors/execute.py", line 121, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/jupyter_core/utils/__init__.py", line 166, in wrapped
+    return loop.run_until_complete(inner)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/asyncio/base_events.py", line 616, in run_until_complete
+    return future.result()
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbclient/client.py", line 1058, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbclient/client.py", line 914, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+from hw3.answers import part1_generation_params
+
+start_seq, temperature = part1_generation_params()
+
+generated_sequence = charnn.generate_from_model(
+    model, start_seq, 10000, (char_to_idx,idx_to_char), T=temperature
+)
+
+print(generated_sequence)
+------------------
+
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mRuntimeError[0m                              Traceback (most recent call last)
+Cell [0;32mIn[21], line 5[0m
+[1;32m      1[0m [38;5;28;01mfrom[39;00m [38;5;21;01mhw3[39;00m[38;5;21;01m.[39;00m[38;5;21;01manswers[39;00m [38;5;28;01mimport[39;00m part1_generation_params
+[1;32m      3[0m start_seq, temperature [38;5;241m=[39m part1_generation_params()
+[0;32m----> 5[0m generated_sequence [38;5;241m=[39m [43mcharnn[49m[38;5;241;43m.[39;49m[43mgenerate_from_model[49m[43m([49m
+[1;32m      6[0m [43m    [49m[43mmodel[49m[43m,[49m[43m [49m[43mstart_seq[49m[43m,[49m[43m [49m[38;5;241;43m10000[39;49m[43m,[49m[43m [49m[43m([49m[43mchar_to_idx[49m[43m,[49m[43midx_to_char[49m[43m)[49m[43m,[49m[43m [49m[43mT[49m[38;5;241;43m=[39;49m[43mtemperature[49m
+[1;32m      7[0m [43m)[49m
+[1;32m      9[0m [38;5;28mprint[39m(generated_sequence)
+
+File [0;32m~/hw3/hw3_spring_23/hw3/charnn.py:194[0m, in [0;36mgenerate_from_model[0;34m(model, start_sequence, n_chars, char_maps, T)[0m
+[1;32m    192[0m [38;5;66;03m# feeding model with start seuence[39;00m
+[1;32m    193[0m x0 [38;5;241m=[39m chars_to_onehot(start_sequence, char_to_idx)[38;5;241m.[39munsqueeze(dim [38;5;241m=[39m [38;5;241m0[39m)[38;5;241m.[39mto(device)
+[0;32m--> 194[0m y, h_s [38;5;241m=[39m [43mmodel[49m[43m([49m[43mx0[49m[43m)[49m [38;5;66;03m# result which contains scores to predict next char, and the model state[39;00m
+[1;32m    196[0m [38;5;28;01mwhile[39;00m [38;5;28mlen[39m(out_text) [38;5;241m<[39m n_chars:
+[1;32m    197[0m 
+[1;32m    198[0m     [38;5;66;03m# calculate distribution and sample char.[39;00m
+[1;32m    199[0m     probabilities [38;5;241m=[39m hot_softmax(y[:,[38;5;241m-[39m[38;5;241m1[39m,:], dim [38;5;241m=[39m [38;5;241m-[39m[38;5;241m1[39m, temperature [38;5;241m=[39m T)
+
+File [0;32m~/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/torch/nn/modules/module.py:1102[0m, in [0;36mModule._call_impl[0;34m(self, *input, **kwargs)[0m
+[1;32m   1098[0m [38;5;66;03m# If we don't have any hooks, we want to skip the rest of the logic in[39;00m
+[1;32m   1099[0m [38;5;66;03m# this function, and just call forward.[39;00m
+[1;32m   1100[0m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m ([38;5;28mself[39m[38;5;241m.[39m_backward_hooks [38;5;129;01mor[39;00m [38;5;28mself[39m[38;5;241m.[39m_forward_hooks [38;5;129;01mor[39;00m [38;5;28mself[39m[38;5;241m.[39m_forward_pre_hooks [38;5;129;01mor[39;00m _global_backward_hooks
+[1;32m   1101[0m         [38;5;129;01mor[39;00m _global_forward_hooks [38;5;129;01mor[39;00m _global_forward_pre_hooks):
+[0;32m-> 1102[0m     [38;5;28;01mreturn[39;00m [43mforward_call[49m[43m([49m[38;5;241;43m*[39;49m[38;5;28;43minput[39;49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+[1;32m   1103[0m [38;5;66;03m# Do not call functions when jit is used[39;00m
+[1;32m   1104[0m full_backward_hooks, non_full_backward_hooks [38;5;241m=[39m [], []
+
+File [0;32m~/hw3/hw3_spring_23/hw3/charnn.py:390[0m, in [0;36mMultilayerGRU.forward[0;34m(self, input, hidden_state)[0m
+[1;32m    387[0m     FinalLayerHsList[38;5;241m.[39mappend(h[[38;5;241m-[39m[38;5;241m1[39m]) [38;5;66;03m# each h[-1] is of shape (B,H)[39;00m
+[1;32m    389[0m [38;5;66;03m# FinalLayerHsList[0] shape is (B,H) so stacking FinalLayerHsList in dim = 1 results in shape (B,S,H)[39;00m
+[0;32m--> 390[0m FinalLayerHs [38;5;241m=[39m [43mtorch[49m[38;5;241;43m.[39;49m[43mstack[49m[43m([49m[43mFinalLayerHsList[49m[43m,[49m[43m [49m[43mdim[49m[43m [49m[38;5;241;43m=[39;49m[43m [49m[38;5;241;43m1[39;49m[43m)[49m
+[1;32m    392[0m layer_output [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39mWhy(FinalLayerHs) [38;5;66;03m#  (B,S,H) --->  (B,S,O)[39;00m
+[1;32m    394[0m [38;5;66;03m# layer_states[0] shape is (B,H) so stacking layer_states in dim = 1 results in shape (B,L,H)[39;00m
+
+[0;31mRuntimeError[0m: stack expects a non-empty TensorList
+
+Got errors while executing notebook Part1_Sequence.ipynb. Make sure you've implemented everything and that all tests pass.
+>> Running 1 notebooks...
+>> Running nbconvert on notebook Part1_Sequence.ipynb [execute|inplace]

@@ -1,0 +1,3216 @@
+[NbConvertApp] Converting notebook Part1_Sequence.ipynb to notebook
+Traceback (most recent call last):
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/bin/jupyter-nbconvert", line 10, in <module>
+    sys.exit(main())
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/jupyter_core/application.py", line 277, in launch_instance
+    return super().launch_instance(argv=argv, **kwargs)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/traitlets/config/application.py", line 1043, in launch_instance
+    app.start()
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/nbconvertapp.py", line 414, in start
+    self.convert_notebooks()
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/nbconvertapp.py", line 589, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/nbconvertapp.py", line 555, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/nbconvertapp.py", line 481, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/exporters/exporter.py", line 352, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/preprocessors/execute.py", line 100, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbconvert/preprocessors/execute.py", line 121, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/jupyter_core/utils/__init__.py", line 166, in wrapped
+    return loop.run_until_complete(inner)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/asyncio/base_events.py", line 616, in run_until_complete
+    return future.result()
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbclient/client.py", line 1058, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/home/guylevy/miniconda3/envs/cs236781-hw/lib/python3.8/site-packages/nbclient/client.py", line 914, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+from cs236781.plot import plot_fit
+
+def post_epoch_fn(epoch, train_res, test_res, verbose):
+    # Update learning rate
+    scheduler.step(test_res.accuracy)
+    # Sample from model to show progress
+    if verbose:
+        start_seq = "ACT I."
+        generated_sequence = charnn.generate_from_model(
+            model, start_seq, 100, (char_to_idx,idx_to_char), T=0.5
+        )
+        print(generated_sequence)
+
+# Train, unless final checkpoint is found
+checkpoint_file_final = f'{checkpoint_file}_final.pt'
+if os.path.isfile(checkpoint_file_final):
+    print(f'*** Loading final checkpoint file {checkpoint_file_final} instead of training')
+    saved_state = torch.load(checkpoint_file_final, map_location=device)
+    model.load_state_dict(saved_state['model_state'])
+else:
+    try:
+        # Print pre-training sampling
+        print(charnn.generate_from_model(model, "ACT I.", 100, (char_to_idx,idx_to_char), T=0.5))
+
+        fit_res = trainer.fit(dl_train, dl_test, num_epochs, max_batches=None,
+                              post_epoch_fn=post_epoch_fn, early_stopping=early_stopping,
+                              checkpoints=checkpoint_file, print_every=1)
+        
+        fig, axes = plot_fit(fit_res)
+    except KeyboardInterrupt as e:
+        print('\n *** Training interrupted by user')
+------------------
+
+----- stdout -----
+ACT I.!qz]7B:ZrLC1ZlSmgdhyn'HhT:'4ozHz6(t3BzA.2dG6q't3yjYrvA.&qX(Ab;p&qUp-A-Tel!htT!),&!13?]Dn1F41zy
+--- EPOCH 1/50 ---
+----- stdout -----
+train_batch:   0%|          | 0/697 [00:00<?, ?it/s]
+----- stdout -----
+train_batch (4.320):   0%|          | 0/697 [00:00<?, ?it/s]
+----- stdout -----
+train_batch (4.320):   0%|          | 1/697 [00:00<07:03,  1.64it/s]
+----- stdout -----
+train_batch (4.059):   0%|          | 1/697 [00:01<07:03,  1.64it/s]
+----- stdout -----
+train_batch (4.059):   0%|          | 2/697 [00:01<06:23,  1.81it/s]
+----- stdout -----
+train_batch (3.546):   0%|          | 2/697 [00:01<06:23,  1.81it/s]
+----- stdout -----
+train_batch (3.546):   0%|          | 3/697 [00:01<06:10,  1.87it/s]
+----- stdout -----
+train_batch (3.407):   0%|          | 3/697 [00:02<06:10,  1.87it/s]
+----- stdout -----
+train_batch (3.407):   1%|          | 4/697 [00:02<06:04,  1.90it/s]
+----- stdout -----
+train_batch (3.246):   1%|          | 4/697 [00:02<06:04,  1.90it/s]
+----- stdout -----
+train_batch (3.246):   1%|          | 5/697 [00:02<06:13,  1.85it/s]
+----- stdout -----
+train_batch (3.224):   1%|          | 5/697 [00:03<06:13,  1.85it/s]
+----- stdout -----
+train_batch (3.224):   1%|          | 6/697 [00:03<06:06,  1.88it/s]
+----- stdout -----
+train_batch (3.221):   1%|          | 6/697 [00:03<06:06,  1.88it/s]
+----- stdout -----
+train_batch (3.221):   1%|          | 7/697 [00:03<06:02,  1.90it/s]
+----- stdout -----
+train_batch (3.211):   1%|          | 7/697 [00:04<06:02,  1.90it/s]
+----- stdout -----
+train_batch (3.211):   1%|          | 8/697 [00:04<05:59,  1.92it/s]
+----- stdout -----
+train_batch (3.191):   1%|          | 8/697 [00:04<05:59,  1.92it/s]
+----- stdout -----
+train_batch (3.191):   1%|▏         | 9/697 [00:04<05:57,  1.92it/s]
+----- stdout -----
+train_batch (3.203):   1%|▏         | 9/697 [00:05<05:57,  1.92it/s]
+----- stdout -----
+train_batch (3.203):   1%|▏         | 10/697 [00:05<05:59,  1.91it/s]
+----- stdout -----
+train_batch (3.172):   1%|▏         | 10/697 [00:05<05:59,  1.91it/s]
+----- stdout -----
+train_batch (3.172):   2%|▏         | 11/697 [00:05<06:04,  1.88it/s]
+----- stdout -----
+train_batch (3.175):   2%|▏         | 11/697 [00:06<06:04,  1.88it/s]
+----- stdout -----
+train_batch (3.175):   2%|▏         | 12/697 [00:06<06:00,  1.90it/s]
+----- stdout -----
+train_batch (3.187):   2%|▏         | 12/697 [00:06<06:00,  1.90it/s]
+----- stdout -----
+train_batch (3.187):   2%|▏         | 13/697 [00:06<05:57,  1.92it/s]
+----- stdout -----
+train_batch (3.225):   2%|▏         | 13/697 [00:07<05:57,  1.92it/s]
+----- stdout -----
+train_batch (3.225):   2%|▏         | 14/697 [00:07<05:56,  1.92it/s]
+----- stdout -----
+train_batch (3.200):   2%|▏         | 14/697 [00:07<05:56,  1.92it/s]
+----- stdout -----
+train_batch (3.200):   2%|▏         | 15/697 [00:07<05:54,  1.92it/s]
+----- stdout -----
+train_batch (3.228):   2%|▏         | 15/697 [00:08<05:54,  1.92it/s]
+----- stdout -----
+train_batch (3.228):   2%|▏         | 16/697 [00:08<05:53,  1.93it/s]
+----- stdout -----
+train_batch (3.198):   2%|▏         | 16/697 [00:08<05:53,  1.93it/s]
+----- stdout -----
+train_batch (3.198):   2%|▏         | 17/697 [00:08<05:51,  1.93it/s]
+----- stdout -----
+train_batch (3.207):   2%|▏         | 17/697 [00:09<05:51,  1.93it/s]
+----- stdout -----
+train_batch (3.207):   3%|▎         | 18/697 [00:09<05:50,  1.94it/s]
+----- stdout -----
+train_batch (3.178):   3%|▎         | 18/697 [00:09<05:50,  1.94it/s]
+----- stdout -----
+train_batch (3.178):   3%|▎         | 19/697 [00:09<05:50,  1.93it/s]
+----- stdout -----
+train_batch (3.198):   3%|▎         | 19/697 [00:10<05:50,  1.93it/s]
+----- stdout -----
+train_batch (3.198):   3%|▎         | 20/697 [00:10<05:49,  1.94it/s]
+----- stdout -----
+train_batch (3.161):   3%|▎         | 20/697 [00:10<05:49,  1.94it/s]
+----- stdout -----
+train_batch (3.161):   3%|▎         | 21/697 [00:10<05:47,  1.95it/s]
+----- stdout -----
+train_batch (3.159):   3%|▎         | 21/697 [00:11<05:47,  1.95it/s]
+----- stdout -----
+train_batch (3.159):   3%|▎         | 22/697 [00:11<05:46,  1.95it/s]
+----- stdout -----
+train_batch (3.240):   3%|▎         | 22/697 [00:12<05:46,  1.95it/s]
+----- stdout -----
+train_batch (3.240):   3%|▎         | 23/697 [00:12<05:45,  1.95it/s]
+----- stdout -----
+train_batch (3.206):   3%|▎         | 23/697 [00:12<05:45,  1.95it/s]
+----- stdout -----
+train_batch (3.206):   3%|▎         | 24/697 [00:12<05:47,  1.94it/s]
+----- stdout -----
+train_batch (3.173):   3%|▎         | 24/697 [00:13<05:47,  1.94it/s]
+----- stdout -----
+train_batch (3.173):   4%|▎         | 25/697 [00:13<05:46,  1.94it/s]
+----- stdout -----
+train_batch (3.153):   4%|▎         | 25/697 [00:13<05:46,  1.94it/s]
+----- stdout -----
+train_batch (3.153):   4%|▎         | 26/697 [00:13<05:45,  1.94it/s]
+----- stdout -----
+train_batch (3.200):   4%|▎         | 26/697 [00:14<05:45,  1.94it/s]
+----- stdout -----
+train_batch (3.200):   4%|▍         | 27/697 [00:14<05:44,  1.94it/s]
+----- stdout -----
+train_batch (3.154):   4%|▍         | 27/697 [00:14<05:44,  1.94it/s]
+----- stdout -----
+train_batch (3.154):   4%|▍         | 28/697 [00:14<05:43,  1.95it/s]
+----- stdout -----
+train_batch (3.127):   4%|▍         | 28/697 [00:15<05:43,  1.95it/s]
+----- stdout -----
+train_batch (3.127):   4%|▍         | 29/697 [00:15<05:42,  1.95it/s]
+----- stdout -----
+train_batch (3.168):   4%|▍         | 29/697 [00:15<05:42,  1.95it/s]
+----- stdout -----
+train_batch (3.168):   4%|▍         | 30/697 [00:15<05:41,  1.95it/s]
+----- stdout -----
+train_batch (3.180):   4%|▍         | 30/697 [00:16<05:41,  1.95it/s]
+----- stdout -----
+train_batch (3.180):   4%|▍         | 31/697 [00:16<05:42,  1.95it/s]
+----- stdout -----
+train_batch (3.142):   4%|▍         | 31/697 [00:16<05:42,  1.95it/s]
+----- stdout -----
+train_batch (3.142):   5%|▍         | 32/697 [00:16<05:41,  1.95it/s]
+----- stdout -----
+train_batch (3.172):   5%|▍         | 32/697 [00:17<05:41,  1.95it/s]
+----- stdout -----
+train_batch (3.172):   5%|▍         | 33/697 [00:17<05:42,  1.94it/s]
+----- stdout -----
+train_batch (3.179):   5%|▍         | 33/697 [00:17<05:42,  1.94it/s]
+----- stdout -----
+train_batch (3.179):   5%|▍         | 34/697 [00:17<05:44,  1.92it/s]
+----- stdout -----
+train_batch (3.150):   5%|▍         | 34/697 [00:18<05:44,  1.92it/s]
+----- stdout -----
+train_batch (3.150):   5%|▌         | 35/697 [00:18<05:44,  1.92it/s]
+----- stdout -----
+train_batch (3.147):   5%|▌         | 35/697 [00:18<05:44,  1.92it/s]
+----- stdout -----
+train_batch (3.147):   5%|▌         | 36/697 [00:18<05:42,  1.93it/s]
+----- stdout -----
+train_batch (3.177):   5%|▌         | 36/697 [00:19<05:42,  1.93it/s]
+----- stdout -----
+train_batch (3.177):   5%|▌         | 37/697 [00:19<05:40,  1.94it/s]
+----- stdout -----
+train_batch (3.125):   5%|▌         | 37/697 [00:19<05:40,  1.94it/s]
+----- stdout -----
+train_batch (3.125):   5%|▌         | 38/697 [00:19<05:38,  1.95it/s]
+----- stdout -----
+train_batch (3.160):   5%|▌         | 38/697 [00:20<05:38,  1.95it/s]
+----- stdout -----
+train_batch (3.160):   6%|▌         | 39/697 [00:20<05:37,  1.95it/s]
+----- stdout -----
+train_batch (3.145):   6%|▌         | 39/697 [00:20<05:37,  1.95it/s]
+----- stdout -----
+train_batch (3.145):   6%|▌         | 40/697 [00:20<05:36,  1.95it/s]
+----- stdout -----
+train_batch (3.151):   6%|▌         | 40/697 [00:21<05:36,  1.95it/s]
+----- stdout -----
+train_batch (3.151):   6%|▌         | 41/697 [00:21<05:36,  1.95it/s]
+----- stdout -----
+train_batch (3.136):   6%|▌         | 41/697 [00:21<05:36,  1.95it/s]
+----- stdout -----
+train_batch (3.136):   6%|▌         | 42/697 [00:21<05:34,  1.96it/s]
+----- stdout -----
+train_batch (3.181):   6%|▌         | 42/697 [00:22<05:34,  1.96it/s]
+----- stdout -----
+train_batch (3.181):   6%|▌         | 43/697 [00:22<05:32,  1.97it/s]
+----- stdout -----
+train_batch (3.162):   6%|▌         | 43/697 [00:22<05:32,  1.97it/s]
+----- stdout -----
+train_batch (3.162):   6%|▋         | 44/697 [00:22<05:32,  1.96it/s]
+----- stdout -----
+train_batch (3.146):   6%|▋         | 44/697 [00:23<05:32,  1.96it/s]
+----- stdout -----
+train_batch (3.146):   6%|▋         | 45/697 [00:23<05:31,  1.97it/s]
+----- stdout -----
+train_batch (3.210):   6%|▋         | 45/697 [00:23<05:31,  1.97it/s]
+----- stdout -----
+train_batch (3.210):   7%|▋         | 46/697 [00:23<05:31,  1.97it/s]
+----- stdout -----
+train_batch (3.164):   7%|▋         | 46/697 [00:24<05:31,  1.97it/s]
+----- stdout -----
+train_batch (3.164):   7%|▋         | 47/697 [00:24<05:31,  1.96it/s]
+----- stdout -----
+train_batch (3.188):   7%|▋         | 47/697 [00:24<05:31,  1.96it/s]
+----- stdout -----
+train_batch (3.188):   7%|▋         | 48/697 [00:24<05:29,  1.97it/s]
+----- stdout -----
+train_batch (3.131):   7%|▋         | 48/697 [00:25<05:29,  1.97it/s]
+----- stdout -----
+train_batch (3.131):   7%|▋         | 49/697 [00:25<05:29,  1.97it/s]
+----- stdout -----
+train_batch (3.177):   7%|▋         | 49/697 [00:25<05:29,  1.97it/s]
+----- stdout -----
+train_batch (3.177):   7%|▋         | 50/697 [00:25<05:28,  1.97it/s]
+----- stdout -----
+train_batch (3.113):   7%|▋         | 50/697 [00:26<05:28,  1.97it/s]
+----- stdout -----
+train_batch (3.113):   7%|▋         | 51/697 [00:26<05:29,  1.96it/s]
+----- stdout -----
+train_batch (3.127):   7%|▋         | 51/697 [00:26<05:29,  1.96it/s]
+----- stdout -----
+train_batch (3.127):   7%|▋         | 52/697 [00:26<05:29,  1.96it/s]
+----- stdout -----
+train_batch (3.125):   7%|▋         | 52/697 [00:27<05:29,  1.96it/s]
+----- stdout -----
+train_batch (3.125):   8%|▊         | 53/697 [00:27<05:29,  1.95it/s]
+----- stdout -----
+train_batch (3.138):   8%|▊         | 53/697 [00:27<05:29,  1.95it/s]
+----- stdout -----
+train_batch (3.138):   8%|▊         | 54/697 [00:27<05:29,  1.95it/s]
+----- stdout -----
+train_batch (3.175):   8%|▊         | 54/697 [00:28<05:29,  1.95it/s]
+----- stdout -----
+train_batch (3.175):   8%|▊         | 55/697 [00:28<05:29,  1.95it/s]
+----- stdout -----
+train_batch (3.201):   8%|▊         | 55/697 [00:28<05:29,  1.95it/s]
+----- stdout -----
+train_batch (3.201):   8%|▊         | 56/697 [00:28<05:31,  1.94it/s]
+----- stdout -----
+train_batch (3.173):   8%|▊         | 56/697 [00:29<05:31,  1.94it/s]
+----- stdout -----
+train_batch (3.173):   8%|▊         | 57/697 [00:29<05:34,  1.92it/s]
+----- stdout -----
+train_batch (3.197):   8%|▊         | 57/697 [00:30<05:34,  1.92it/s]
+----- stdout -----
+train_batch (3.197):   8%|▊         | 58/697 [00:30<05:36,  1.90it/s]
+----- stdout -----
+train_batch (3.187):   8%|▊         | 58/697 [00:30<05:36,  1.90it/s]
+----- stdout -----
+train_batch (3.187):   8%|▊         | 59/697 [00:30<05:33,  1.91it/s]
+----- stdout -----
+train_batch (3.114):   8%|▊         | 59/697 [00:31<05:33,  1.91it/s]
+----- stdout -----
+train_batch (3.114):   9%|▊         | 60/697 [00:31<05:30,  1.92it/s]
+----- stdout -----
+train_batch (3.142):   9%|▊         | 60/697 [00:31<05:30,  1.92it/s]
+----- stdout -----
+train_batch (3.142):   9%|▉         | 61/697 [00:31<05:29,  1.93it/s]
+----- stdout -----
+train_batch (3.137):   9%|▉         | 61/697 [00:32<05:29,  1.93it/s]
+----- stdout -----
+train_batch (3.137):   9%|▉         | 62/697 [00:32<05:43,  1.85it/s]
+----- stdout -----
+train_batch (3.157):   9%|▉         | 62/697 [00:32<05:43,  1.85it/s]
+----- stdout -----
+train_batch (3.157):   9%|▉         | 63/697 [00:32<05:37,  1.88it/s]
+----- stdout -----
+train_batch (3.195):   9%|▉         | 63/697 [00:33<05:37,  1.88it/s]
+----- stdout -----
+train_batch (3.195):   9%|▉         | 64/697 [00:33<05:33,  1.90it/s]
+----- stdout -----
+train_batch (3.159):   9%|▉         | 64/697 [00:33<05:33,  1.90it/s]
+----- stdout -----
+train_batch (3.159):   9%|▉         | 65/697 [00:33<05:30,  1.91it/s]
+----- stdout -----
+train_batch (3.189):   9%|▉         | 65/697 [00:34<05:30,  1.91it/s]
+----- stdout -----
+train_batch (3.189):   9%|▉         | 66/697 [00:34<05:27,  1.93it/s]
+----- stdout -----
+train_batch (3.166):   9%|▉         | 66/697 [00:34<05:27,  1.93it/s]
+----- stdout -----
+train_batch (3.166):  10%|▉         | 67/697 [00:34<05:25,  1.94it/s]
+----- stdout -----
+train_batch (3.145):  10%|▉         | 67/697 [00:35<05:25,  1.94it/s]
+----- stdout -----
+train_batch (3.145):  10%|▉         | 68/697 [00:35<05:24,  1.94it/s]
+----- stdout -----
+train_batch (3.173):  10%|▉         | 68/697 [00:35<05:24,  1.94it/s]
+----- stdout -----
+train_batch (3.173):  10%|▉         | 69/697 [00:35<05:25,  1.93it/s]
+----- stdout -----
+train_batch (3.180):  10%|▉         | 69/697 [00:36<05:25,  1.93it/s]
+----- stdout -----
+train_batch (3.180):  10%|█         | 70/697 [00:36<05:23,  1.94it/s]
+----- stdout -----
+train_batch (3.178):  10%|█         | 70/697 [00:36<05:23,  1.94it/s]
+----- stdout -----
+train_batch (3.178):  10%|█         | 71/697 [00:36<05:22,  1.94it/s]
+----- stdout -----
+train_batch (3.153):  10%|█         | 71/697 [00:37<05:22,  1.94it/s]
+----- stdout -----
+train_batch (3.153):  10%|█         | 72/697 [00:37<05:21,  1.95it/s]
+----- stdout -----
+train_batch (3.170):  10%|█         | 72/697 [00:37<05:21,  1.95it/s]
+----- stdout -----
+train_batch (3.170):  10%|█         | 73/697 [00:37<05:20,  1.95it/s]
+----- stdout -----
+train_batch (3.192):  10%|█         | 73/697 [00:38<05:20,  1.95it/s]
+----- stdout -----
+train_batch (3.192):  11%|█         | 74/697 [00:38<05:20,  1.95it/s]
+----- stdout -----
+train_batch (3.169):  11%|█         | 74/697 [00:38<05:20,  1.95it/s]
+----- stdout -----
+train_batch (3.169):  11%|█         | 75/697 [00:38<05:18,  1.95it/s]
+----- stdout -----
+train_batch (3.161):  11%|█         | 75/697 [00:39<05:18,  1.95it/s]
+----- stdout -----
+train_batch (3.161):  11%|█         | 76/697 [00:39<05:18,  1.95it/s]
+----- stdout -----
+train_batch (3.163):  11%|█         | 76/697 [00:39<05:18,  1.95it/s]
+----- stdout -----
+train_batch (3.163):  11%|█         | 77/697 [00:39<05:18,  1.95it/s]
+----- stdout -----
+train_batch (3.189):  11%|█         | 77/697 [00:40<05:18,  1.95it/s]
+----- stdout -----
+train_batch (3.189):  11%|█         | 78/697 [00:40<05:18,  1.94it/s]
+----- stdout -----
+train_batch (3.177):  11%|█         | 78/697 [00:40<05:18,  1.94it/s]
+----- stdout -----
+train_batch (3.177):  11%|█▏        | 79/697 [00:40<05:19,  1.93it/s]
+----- stdout -----
+train_batch (3.201):  11%|█▏        | 79/697 [00:41<05:19,  1.93it/s]
+----- stdout -----
+train_batch (3.201):  11%|█▏        | 80/697 [00:41<05:20,  1.93it/s]
+----- stdout -----
+train_batch (3.174):  11%|█▏        | 80/697 [00:41<05:20,  1.93it/s]
+----- stdout -----
+train_batch (3.174):  12%|█▏        | 81/697 [00:41<05:20,  1.92it/s]
+----- stdout -----
+train_batch (3.219):  12%|█▏        | 81/697 [00:42<05:20,  1.92it/s]
+----- stdout -----
+train_batch (3.219):  12%|█▏        | 82/697 [00:42<05:18,  1.93it/s]
+----- stdout -----
+train_batch (3.199):  12%|█▏        | 82/697 [00:42<05:18,  1.93it/s]
+----- stdout -----
+train_batch (3.199):  12%|█▏        | 83/697 [00:42<05:17,  1.93it/s]
+----- stdout -----
+train_batch (3.141):  12%|█▏        | 83/697 [00:43<05:17,  1.93it/s]
+----- stdout -----
+train_batch (3.141):  12%|█▏        | 84/697 [00:43<05:16,  1.94it/s]
+----- stdout -----
+train_batch (3.180):  12%|█▏        | 84/697 [00:43<05:16,  1.94it/s]
+----- stdout -----
+train_batch (3.180):  12%|█▏        | 85/697 [00:43<05:14,  1.94it/s]
+----- stdout -----
+train_batch (3.220):  12%|█▏        | 85/697 [00:44<05:14,  1.94it/s]
+----- stdout -----
+train_batch (3.220):  12%|█▏        | 86/697 [00:44<05:14,  1.94it/s]
+----- stdout -----
+train_batch (3.155):  12%|█▏        | 86/697 [00:45<05:14,  1.94it/s]
+----- stdout -----
+train_batch (3.155):  12%|█▏        | 87/697 [00:45<05:13,  1.95it/s]
+----- stdout -----
+train_batch (3.182):  12%|█▏        | 87/697 [00:45<05:13,  1.95it/s]
+----- stdout -----
+train_batch (3.182):  13%|█▎        | 88/697 [00:45<05:12,  1.95it/s]
+----- stdout -----
+train_batch (3.170):  13%|█▎        | 88/697 [00:46<05:12,  1.95it/s]
+----- stdout -----
+train_batch (3.170):  13%|█▎        | 89/697 [00:46<05:11,  1.95it/s]
+----- stdout -----
+train_batch (3.199):  13%|█▎        | 89/697 [00:46<05:11,  1.95it/s]
+----- stdout -----
+train_batch (3.199):  13%|█▎        | 90/697 [00:46<05:11,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  13%|█▎        | 90/697 [00:47<05:11,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  13%|█▎        | 91/697 [00:47<05:11,  1.95it/s]
+----- stdout -----
+train_batch (3.144):  13%|█▎        | 91/697 [00:47<05:11,  1.95it/s]
+----- stdout -----
+train_batch (3.144):  13%|█▎        | 92/697 [00:47<05:10,  1.95it/s]
+----- stdout -----
+train_batch (3.154):  13%|█▎        | 92/697 [00:48<05:10,  1.95it/s]
+----- stdout -----
+train_batch (3.154):  13%|█▎        | 93/697 [00:48<05:10,  1.95it/s]
+----- stdout -----
+train_batch (3.120):  13%|█▎        | 93/697 [00:48<05:10,  1.95it/s]
+----- stdout -----
+train_batch (3.120):  13%|█▎        | 94/697 [00:48<05:09,  1.95it/s]
+----- stdout -----
+train_batch (3.187):  13%|█▎        | 94/697 [00:49<05:09,  1.95it/s]
+----- stdout -----
+train_batch (3.187):  14%|█▎        | 95/697 [00:49<05:08,  1.95it/s]
+----- stdout -----
+train_batch (3.184):  14%|█▎        | 95/697 [00:49<05:08,  1.95it/s]
+----- stdout -----
+train_batch (3.184):  14%|█▍        | 96/697 [00:49<05:08,  1.95it/s]
+----- stdout -----
+train_batch (3.175):  14%|█▍        | 96/697 [00:50<05:08,  1.95it/s]
+----- stdout -----
+train_batch (3.175):  14%|█▍        | 97/697 [00:50<05:07,  1.95it/s]
+----- stdout -----
+train_batch (3.142):  14%|█▍        | 97/697 [00:50<05:07,  1.95it/s]
+----- stdout -----
+train_batch (3.142):  14%|█▍        | 98/697 [00:50<05:07,  1.95it/s]
+----- stdout -----
+train_batch (3.164):  14%|█▍        | 98/697 [00:51<05:07,  1.95it/s]
+----- stdout -----
+train_batch (3.164):  14%|█▍        | 99/697 [00:51<05:06,  1.95it/s]
+----- stdout -----
+train_batch (3.128):  14%|█▍        | 99/697 [00:51<05:06,  1.95it/s]
+----- stdout -----
+train_batch (3.128):  14%|█▍        | 100/697 [00:51<05:06,  1.95it/s]
+----- stdout -----
+train_batch (3.151):  14%|█▍        | 100/697 [00:52<05:06,  1.95it/s]
+----- stdout -----
+train_batch (3.151):  14%|█▍        | 101/697 [00:52<05:05,  1.95it/s]
+----- stdout -----
+train_batch (3.169):  14%|█▍        | 101/697 [00:52<05:05,  1.95it/s]
+----- stdout -----
+train_batch (3.169):  15%|█▍        | 102/697 [00:52<05:12,  1.91it/s]
+----- stdout -----
+train_batch (3.159):  15%|█▍        | 102/697 [00:53<05:12,  1.91it/s]
+----- stdout -----
+train_batch (3.159):  15%|█▍        | 103/697 [00:53<05:11,  1.91it/s]
+----- stdout -----
+train_batch (3.152):  15%|█▍        | 103/697 [00:53<05:11,  1.91it/s]
+----- stdout -----
+train_batch (3.152):  15%|█▍        | 104/697 [00:53<05:09,  1.92it/s]
+----- stdout -----
+train_batch (3.145):  15%|█▍        | 104/697 [00:54<05:09,  1.92it/s]
+----- stdout -----
+train_batch (3.145):  15%|█▌        | 105/697 [00:54<05:07,  1.93it/s]
+----- stdout -----
+train_batch (3.167):  15%|█▌        | 105/697 [00:54<05:07,  1.93it/s]
+----- stdout -----
+train_batch (3.167):  15%|█▌        | 106/697 [00:54<05:05,  1.93it/s]
+----- stdout -----
+train_batch (3.186):  15%|█▌        | 106/697 [00:55<05:05,  1.93it/s]
+----- stdout -----
+train_batch (3.186):  15%|█▌        | 107/697 [00:55<05:04,  1.94it/s]
+----- stdout -----
+train_batch (3.172):  15%|█▌        | 107/697 [00:55<05:04,  1.94it/s]
+----- stdout -----
+train_batch (3.172):  15%|█▌        | 108/697 [00:55<05:03,  1.94it/s]
+----- stdout -----
+train_batch (3.216):  15%|█▌        | 108/697 [00:56<05:03,  1.94it/s]
+----- stdout -----
+train_batch (3.216):  16%|█▌        | 109/697 [00:56<05:02,  1.94it/s]
+----- stdout -----
+train_batch (3.195):  16%|█▌        | 109/697 [00:56<05:02,  1.94it/s]
+----- stdout -----
+train_batch (3.195):  16%|█▌        | 110/697 [00:56<05:01,  1.95it/s]
+----- stdout -----
+train_batch (3.175):  16%|█▌        | 110/697 [00:57<05:01,  1.95it/s]
+----- stdout -----
+train_batch (3.175):  16%|█▌        | 111/697 [00:57<05:01,  1.95it/s]
+----- stdout -----
+train_batch (3.209):  16%|█▌        | 111/697 [00:57<05:01,  1.95it/s]
+----- stdout -----
+train_batch (3.209):  16%|█▌        | 112/697 [00:57<05:00,  1.95it/s]
+----- stdout -----
+train_batch (3.177):  16%|█▌        | 112/697 [00:58<05:00,  1.95it/s]
+----- stdout -----
+train_batch (3.177):  16%|█▌        | 113/697 [00:58<04:59,  1.95it/s]
+----- stdout -----
+train_batch (3.155):  16%|█▌        | 113/697 [00:58<04:59,  1.95it/s]
+----- stdout -----
+train_batch (3.155):  16%|█▋        | 114/697 [00:58<04:59,  1.95it/s]
+----- stdout -----
+train_batch (3.174):  16%|█▋        | 114/697 [00:59<04:59,  1.95it/s]
+----- stdout -----
+train_batch (3.174):  16%|█▋        | 115/697 [00:59<04:58,  1.95it/s]
+----- stdout -----
+train_batch (3.205):  16%|█▋        | 115/697 [00:59<04:58,  1.95it/s]
+----- stdout -----
+train_batch (3.205):  17%|█▋        | 116/697 [00:59<04:57,  1.95it/s]
+----- stdout -----
+train_batch (3.173):  17%|█▋        | 116/697 [01:00<04:57,  1.95it/s]
+----- stdout -----
+train_batch (3.173):  17%|█▋        | 117/697 [01:00<04:57,  1.95it/s]
+----- stdout -----
+train_batch (3.230):  17%|█▋        | 117/697 [01:00<04:57,  1.95it/s]
+----- stdout -----
+train_batch (3.230):  17%|█▋        | 118/697 [01:00<04:57,  1.95it/s]
+----- stdout -----
+train_batch (3.137):  17%|█▋        | 118/697 [01:01<04:57,  1.95it/s]
+----- stdout -----
+train_batch (3.137):  17%|█▋        | 119/697 [01:01<04:56,  1.95it/s]
+----- stdout -----
+train_batch (3.191):  17%|█▋        | 119/697 [01:02<04:56,  1.95it/s]
+----- stdout -----
+train_batch (3.191):  17%|█▋        | 120/697 [01:02<04:55,  1.95it/s]
+----- stdout -----
+train_batch (3.226):  17%|█▋        | 120/697 [01:02<04:55,  1.95it/s]
+----- stdout -----
+train_batch (3.226):  17%|█▋        | 121/697 [01:02<04:55,  1.95it/s]
+----- stdout -----
+train_batch (3.220):  17%|█▋        | 121/697 [01:03<04:55,  1.95it/s]
+----- stdout -----
+train_batch (3.220):  18%|█▊        | 122/697 [01:03<04:54,  1.95it/s]
+----- stdout -----
+train_batch (3.163):  18%|█▊        | 122/697 [01:03<04:54,  1.95it/s]
+----- stdout -----
+train_batch (3.163):  18%|█▊        | 123/697 [01:03<05:07,  1.87it/s]
+----- stdout -----
+train_batch (3.194):  18%|█▊        | 123/697 [01:04<05:07,  1.87it/s]
+----- stdout -----
+train_batch (3.194):  18%|█▊        | 124/697 [01:04<05:02,  1.89it/s]
+----- stdout -----
+train_batch (3.218):  18%|█▊        | 124/697 [01:04<05:02,  1.89it/s]
+----- stdout -----
+train_batch (3.218):  18%|█▊        | 125/697 [01:04<05:07,  1.86it/s]
+----- stdout -----
+train_batch (3.190):  18%|█▊        | 125/697 [01:05<05:07,  1.86it/s]
+----- stdout -----
+train_batch (3.190):  18%|█▊        | 126/697 [01:05<05:04,  1.87it/s]
+----- stdout -----
+train_batch (3.173):  18%|█▊        | 126/697 [01:05<05:04,  1.87it/s]
+----- stdout -----
+train_batch (3.173):  18%|█▊        | 127/697 [01:05<05:01,  1.89it/s]
+----- stdout -----
+train_batch (3.169):  18%|█▊        | 127/697 [01:06<05:01,  1.89it/s]
+----- stdout -----
+train_batch (3.169):  18%|█▊        | 128/697 [01:06<04:58,  1.91it/s]
+----- stdout -----
+train_batch (3.181):  18%|█▊        | 128/697 [01:06<04:58,  1.91it/s]
+----- stdout -----
+train_batch (3.181):  19%|█▊        | 129/697 [01:06<04:55,  1.92it/s]
+----- stdout -----
+train_batch (3.228):  19%|█▊        | 129/697 [01:07<04:55,  1.92it/s]
+----- stdout -----
+train_batch (3.228):  19%|█▊        | 130/697 [01:07<04:53,  1.93it/s]
+----- stdout -----
+train_batch (3.220):  19%|█▊        | 130/697 [01:07<04:53,  1.93it/s]
+----- stdout -----
+train_batch (3.220):  19%|█▉        | 131/697 [01:07<04:52,  1.93it/s]
+----- stdout -----
+train_batch (3.229):  19%|█▉        | 131/697 [01:08<04:52,  1.93it/s]
+----- stdout -----
+train_batch (3.229):  19%|█▉        | 132/697 [01:08<04:51,  1.94it/s]
+----- stdout -----
+train_batch (3.163):  19%|█▉        | 132/697 [01:08<04:51,  1.94it/s]
+----- stdout -----
+train_batch (3.163):  19%|█▉        | 133/697 [01:08<04:50,  1.94it/s]
+----- stdout -----
+train_batch (3.166):  19%|█▉        | 133/697 [01:09<04:50,  1.94it/s]
+----- stdout -----
+train_batch (3.166):  19%|█▉        | 134/697 [01:09<04:49,  1.94it/s]
+----- stdout -----
+train_batch (3.165):  19%|█▉        | 134/697 [01:09<04:49,  1.94it/s]
+----- stdout -----
+train_batch (3.165):  19%|█▉        | 135/697 [01:09<04:48,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  19%|█▉        | 135/697 [01:10<04:48,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  20%|█▉        | 136/697 [01:10<04:48,  1.95it/s]
+----- stdout -----
+train_batch (3.188):  20%|█▉        | 136/697 [01:10<04:48,  1.95it/s]
+----- stdout -----
+train_batch (3.188):  20%|█▉        | 137/697 [01:10<04:47,  1.95it/s]
+----- stdout -----
+train_batch (3.130):  20%|█▉        | 137/697 [01:11<04:47,  1.95it/s]
+----- stdout -----
+train_batch (3.130):  20%|█▉        | 138/697 [01:11<04:47,  1.95it/s]
+----- stdout -----
+train_batch (3.169):  20%|█▉        | 138/697 [01:11<04:47,  1.95it/s]
+----- stdout -----
+train_batch (3.169):  20%|█▉        | 139/697 [01:11<04:46,  1.95it/s]
+----- stdout -----
+train_batch (3.166):  20%|█▉        | 139/697 [01:12<04:46,  1.95it/s]
+----- stdout -----
+train_batch (3.166):  20%|██        | 140/697 [01:12<04:46,  1.94it/s]
+----- stdout -----
+train_batch (3.181):  20%|██        | 140/697 [01:12<04:46,  1.94it/s]
+----- stdout -----
+train_batch (3.181):  20%|██        | 141/697 [01:12<04:45,  1.95it/s]
+----- stdout -----
+train_batch (3.175):  20%|██        | 141/697 [01:13<04:45,  1.95it/s]
+----- stdout -----
+train_batch (3.175):  20%|██        | 142/697 [01:13<04:45,  1.95it/s]
+----- stdout -----
+train_batch (3.168):  20%|██        | 142/697 [01:13<04:45,  1.95it/s]
+----- stdout -----
+train_batch (3.168):  21%|██        | 143/697 [01:13<04:44,  1.95it/s]
+----- stdout -----
+train_batch (3.163):  21%|██        | 143/697 [01:14<04:44,  1.95it/s]
+----- stdout -----
+train_batch (3.163):  21%|██        | 144/697 [01:14<04:43,  1.95it/s]
+----- stdout -----
+train_batch (3.160):  21%|██        | 144/697 [01:14<04:43,  1.95it/s]
+----- stdout -----
+train_batch (3.160):  21%|██        | 145/697 [01:14<04:42,  1.95it/s]
+----- stdout -----
+train_batch (3.127):  21%|██        | 145/697 [01:15<04:42,  1.95it/s]
+----- stdout -----
+train_batch (3.127):  21%|██        | 146/697 [01:15<04:44,  1.94it/s]
+----- stdout -----
+train_batch (3.157):  21%|██        | 146/697 [01:16<04:44,  1.94it/s]
+----- stdout -----
+train_batch (3.157):  21%|██        | 147/697 [01:16<04:43,  1.94it/s]
+----- stdout -----
+train_batch (3.211):  21%|██        | 147/697 [01:16<04:43,  1.94it/s]
+----- stdout -----
+train_batch (3.211):  21%|██        | 148/697 [01:16<04:48,  1.91it/s]
+----- stdout -----
+train_batch (3.187):  21%|██        | 148/697 [01:17<04:48,  1.91it/s]
+----- stdout -----
+train_batch (3.187):  21%|██▏       | 149/697 [01:17<04:47,  1.91it/s]
+----- stdout -----
+train_batch (3.198):  21%|██▏       | 149/697 [01:17<04:47,  1.91it/s]
+----- stdout -----
+train_batch (3.198):  22%|██▏       | 150/697 [01:17<04:45,  1.92it/s]
+----- stdout -----
+train_batch (3.200):  22%|██▏       | 150/697 [01:18<04:45,  1.92it/s]
+----- stdout -----
+train_batch (3.200):  22%|██▏       | 151/697 [01:18<04:43,  1.92it/s]
+----- stdout -----
+train_batch (3.172):  22%|██▏       | 151/697 [01:18<04:43,  1.92it/s]
+----- stdout -----
+train_batch (3.172):  22%|██▏       | 152/697 [01:18<04:42,  1.93it/s]
+----- stdout -----
+train_batch (3.158):  22%|██▏       | 152/697 [01:19<04:42,  1.93it/s]
+----- stdout -----
+train_batch (3.158):  22%|██▏       | 153/697 [01:19<04:40,  1.94it/s]
+----- stdout -----
+train_batch (3.167):  22%|██▏       | 153/697 [01:19<04:40,  1.94it/s]
+----- stdout -----
+train_batch (3.167):  22%|██▏       | 154/697 [01:19<04:39,  1.94it/s]
+----- stdout -----
+train_batch (3.165):  22%|██▏       | 154/697 [01:20<04:39,  1.94it/s]
+----- stdout -----
+train_batch (3.165):  22%|██▏       | 155/697 [01:20<04:38,  1.95it/s]
+----- stdout -----
+train_batch (3.173):  22%|██▏       | 155/697 [01:20<04:38,  1.95it/s]
+----- stdout -----
+train_batch (3.173):  22%|██▏       | 156/697 [01:20<04:37,  1.95it/s]
+----- stdout -----
+train_batch (3.138):  22%|██▏       | 156/697 [01:21<04:37,  1.95it/s]
+----- stdout -----
+train_batch (3.138):  23%|██▎       | 157/697 [01:21<04:37,  1.95it/s]
+----- stdout -----
+train_batch (3.135):  23%|██▎       | 157/697 [01:21<04:37,  1.95it/s]
+----- stdout -----
+train_batch (3.135):  23%|██▎       | 158/697 [01:21<04:37,  1.95it/s]
+----- stdout -----
+train_batch (3.155):  23%|██▎       | 158/697 [01:22<04:37,  1.95it/s]
+----- stdout -----
+train_batch (3.155):  23%|██▎       | 159/697 [01:22<04:36,  1.95it/s]
+----- stdout -----
+train_batch (3.183):  23%|██▎       | 159/697 [01:22<04:36,  1.95it/s]
+----- stdout -----
+train_batch (3.183):  23%|██▎       | 160/697 [01:22<04:35,  1.95it/s]
+----- stdout -----
+train_batch (3.195):  23%|██▎       | 160/697 [01:23<04:35,  1.95it/s]
+----- stdout -----
+train_batch (3.195):  23%|██▎       | 161/697 [01:23<04:35,  1.95it/s]
+----- stdout -----
+train_batch (3.196):  23%|██▎       | 161/697 [01:23<04:35,  1.95it/s]
+----- stdout -----
+train_batch (3.196):  23%|██▎       | 162/697 [01:23<04:36,  1.94it/s]
+----- stdout -----
+train_batch (3.216):  23%|██▎       | 162/697 [01:24<04:36,  1.94it/s]
+----- stdout -----
+train_batch (3.216):  23%|██▎       | 163/697 [01:24<04:35,  1.94it/s]
+----- stdout -----
+train_batch (3.184):  23%|██▎       | 163/697 [01:24<04:35,  1.94it/s]
+----- stdout -----
+train_batch (3.184):  24%|██▎       | 164/697 [01:24<04:34,  1.94it/s]
+----- stdout -----
+train_batch (3.211):  24%|██▎       | 164/697 [01:25<04:34,  1.94it/s]
+----- stdout -----
+train_batch (3.211):  24%|██▎       | 165/697 [01:25<04:33,  1.94it/s]
+----- stdout -----
+train_batch (3.180):  24%|██▎       | 165/697 [01:25<04:33,  1.94it/s]
+----- stdout -----
+train_batch (3.180):  24%|██▍       | 166/697 [01:25<04:33,  1.94it/s]
+----- stdout -----
+train_batch (3.133):  24%|██▍       | 166/697 [01:26<04:33,  1.94it/s]
+----- stdout -----
+train_batch (3.133):  24%|██▍       | 167/697 [01:26<04:32,  1.95it/s]
+----- stdout -----
+train_batch (3.174):  24%|██▍       | 167/697 [01:26<04:32,  1.95it/s]
+----- stdout -----
+train_batch (3.174):  24%|██▍       | 168/697 [01:26<04:31,  1.95it/s]
+----- stdout -----
+train_batch (3.216):  24%|██▍       | 168/697 [01:27<04:31,  1.95it/s]
+----- stdout -----
+train_batch (3.216):  24%|██▍       | 169/697 [01:27<04:30,  1.95it/s]
+----- stdout -----
+train_batch (3.210):  24%|██▍       | 169/697 [01:27<04:30,  1.95it/s]
+----- stdout -----
+train_batch (3.210):  24%|██▍       | 170/697 [01:27<04:31,  1.94it/s]
+----- stdout -----
+train_batch (3.167):  24%|██▍       | 170/697 [01:28<04:31,  1.94it/s]
+----- stdout -----
+train_batch (3.167):  25%|██▍       | 171/697 [01:28<04:32,  1.93it/s]
+----- stdout -----
+train_batch (3.209):  25%|██▍       | 171/697 [01:28<04:32,  1.93it/s]
+----- stdout -----
+train_batch (3.209):  25%|██▍       | 172/697 [01:28<04:31,  1.93it/s]
+----- stdout -----
+train_batch (3.176):  25%|██▍       | 172/697 [01:29<04:31,  1.93it/s]
+----- stdout -----
+train_batch (3.176):  25%|██▍       | 173/697 [01:29<04:30,  1.94it/s]
+----- stdout -----
+train_batch (3.194):  25%|██▍       | 173/697 [01:29<04:30,  1.94it/s]
+----- stdout -----
+train_batch (3.194):  25%|██▍       | 174/697 [01:29<04:28,  1.95it/s]
+----- stdout -----
+train_batch (3.181):  25%|██▍       | 174/697 [01:30<04:28,  1.95it/s]
+----- stdout -----
+train_batch (3.181):  25%|██▌       | 175/697 [01:30<04:26,  1.96it/s]
+----- stdout -----
+train_batch (3.138):  25%|██▌       | 175/697 [01:30<04:26,  1.96it/s]
+----- stdout -----
+train_batch (3.138):  25%|██▌       | 176/697 [01:30<04:25,  1.97it/s]
+----- stdout -----
+train_batch (3.149):  25%|██▌       | 176/697 [01:31<04:25,  1.97it/s]
+----- stdout -----
+train_batch (3.149):  25%|██▌       | 177/697 [01:31<04:23,  1.97it/s]
+----- stdout -----
+train_batch (3.199):  25%|██▌       | 177/697 [01:31<04:23,  1.97it/s]
+----- stdout -----
+train_batch (3.199):  26%|██▌       | 178/697 [01:31<04:23,  1.97it/s]
+----- stdout -----
+train_batch (3.160):  26%|██▌       | 178/697 [01:32<04:23,  1.97it/s]
+----- stdout -----
+train_batch (3.160):  26%|██▌       | 179/697 [01:32<04:23,  1.97it/s]
+----- stdout -----
+train_batch (3.184):  26%|██▌       | 179/697 [01:33<04:23,  1.97it/s]
+----- stdout -----
+train_batch (3.184):  26%|██▌       | 180/697 [01:33<04:35,  1.88it/s]
+----- stdout -----
+train_batch (3.194):  26%|██▌       | 180/697 [01:33<04:35,  1.88it/s]
+----- stdout -----
+train_batch (3.194):  26%|██▌       | 181/697 [01:33<04:31,  1.90it/s]
+----- stdout -----
+train_batch (3.153):  26%|██▌       | 181/697 [01:34<04:31,  1.90it/s]
+----- stdout -----
+train_batch (3.153):  26%|██▌       | 182/697 [01:34<04:28,  1.92it/s]
+----- stdout -----
+train_batch (3.145):  26%|██▌       | 182/697 [01:34<04:28,  1.92it/s]
+----- stdout -----
+train_batch (3.145):  26%|██▋       | 183/697 [01:34<04:26,  1.93it/s]
+----- stdout -----
+train_batch (3.160):  26%|██▋       | 183/697 [01:35<04:26,  1.93it/s]
+----- stdout -----
+train_batch (3.160):  26%|██▋       | 184/697 [01:35<04:25,  1.93it/s]
+----- stdout -----
+train_batch (3.157):  26%|██▋       | 184/697 [01:35<04:25,  1.93it/s]
+----- stdout -----
+train_batch (3.157):  27%|██▋       | 185/697 [01:35<04:24,  1.94it/s]
+----- stdout -----
+train_batch (3.168):  27%|██▋       | 185/697 [01:36<04:24,  1.94it/s]
+----- stdout -----
+train_batch (3.168):  27%|██▋       | 186/697 [01:36<04:23,  1.94it/s]
+----- stdout -----
+train_batch (3.165):  27%|██▋       | 186/697 [01:36<04:23,  1.94it/s]
+----- stdout -----
+train_batch (3.165):  27%|██▋       | 187/697 [01:36<04:22,  1.94it/s]
+----- stdout -----
+train_batch (3.157):  27%|██▋       | 187/697 [01:37<04:22,  1.94it/s]
+----- stdout -----
+train_batch (3.157):  27%|██▋       | 188/697 [01:37<04:21,  1.95it/s]
+----- stdout -----
+train_batch (3.205):  27%|██▋       | 188/697 [01:37<04:21,  1.95it/s]
+----- stdout -----
+train_batch (3.205):  27%|██▋       | 189/697 [01:37<04:20,  1.95it/s]
+----- stdout -----
+train_batch (3.120):  27%|██▋       | 189/697 [01:38<04:20,  1.95it/s]
+----- stdout -----
+train_batch (3.120):  27%|██▋       | 190/697 [01:38<04:19,  1.95it/s]
+----- stdout -----
+train_batch (3.149):  27%|██▋       | 190/697 [01:38<04:19,  1.95it/s]
+----- stdout -----
+train_batch (3.149):  27%|██▋       | 191/697 [01:38<04:20,  1.94it/s]
+----- stdout -----
+train_batch (3.187):  27%|██▋       | 191/697 [01:39<04:20,  1.94it/s]
+----- stdout -----
+train_batch (3.187):  28%|██▊       | 192/697 [01:39<04:19,  1.95it/s]
+----- stdout -----
+train_batch (3.164):  28%|██▊       | 192/697 [01:39<04:19,  1.95it/s]
+----- stdout -----
+train_batch (3.164):  28%|██▊       | 193/697 [01:39<04:18,  1.95it/s]
+----- stdout -----
+train_batch (3.153):  28%|██▊       | 193/697 [01:40<04:18,  1.95it/s]
+----- stdout -----
+train_batch (3.153):  28%|██▊       | 194/697 [01:40<04:20,  1.93it/s]
+----- stdout -----
+train_batch (3.149):  28%|██▊       | 194/697 [01:40<04:20,  1.93it/s]
+----- stdout -----
+train_batch (3.149):  28%|██▊       | 195/697 [01:40<04:20,  1.93it/s]
+----- stdout -----
+train_batch (3.157):  28%|██▊       | 195/697 [01:41<04:20,  1.93it/s]
+----- stdout -----
+train_batch (3.157):  28%|██▊       | 196/697 [01:41<04:17,  1.94it/s]
+----- stdout -----
+train_batch (3.163):  28%|██▊       | 196/697 [01:41<04:17,  1.94it/s]
+----- stdout -----
+train_batch (3.163):  28%|██▊       | 197/697 [01:41<04:15,  1.95it/s]
+----- stdout -----
+train_batch (3.192):  28%|██▊       | 197/697 [01:42<04:15,  1.95it/s]
+----- stdout -----
+train_batch (3.192):  28%|██▊       | 198/697 [01:42<04:15,  1.96it/s]
+----- stdout -----
+train_batch (3.183):  28%|██▊       | 198/697 [01:42<04:15,  1.96it/s]
+----- stdout -----
+train_batch (3.183):  29%|██▊       | 199/697 [01:42<04:14,  1.95it/s]
+----- stdout -----
+train_batch (3.169):  29%|██▊       | 199/697 [01:43<04:14,  1.95it/s]
+----- stdout -----
+train_batch (3.169):  29%|██▊       | 200/697 [01:43<04:14,  1.95it/s]
+----- stdout -----
+train_batch (3.173):  29%|██▊       | 200/697 [01:43<04:14,  1.95it/s]
+----- stdout -----
+train_batch (3.173):  29%|██▉       | 201/697 [01:43<04:13,  1.95it/s]
+----- stdout -----
+train_batch (3.171):  29%|██▉       | 201/697 [01:44<04:13,  1.95it/s]
+----- stdout -----
+train_batch (3.171):  29%|██▉       | 202/697 [01:44<04:14,  1.95it/s]
+----- stdout -----
+train_batch (3.144):  29%|██▉       | 202/697 [01:44<04:14,  1.95it/s]
+----- stdout -----
+train_batch (3.144):  29%|██▉       | 203/697 [01:44<04:13,  1.95it/s]
+----- stdout -----
+train_batch (3.180):  29%|██▉       | 203/697 [01:45<04:13,  1.95it/s]
+----- stdout -----
+train_batch (3.180):  29%|██▉       | 204/697 [01:45<04:12,  1.95it/s]
+----- stdout -----
+train_batch (3.172):  29%|██▉       | 204/697 [01:45<04:12,  1.95it/s]
+----- stdout -----
+train_batch (3.172):  29%|██▉       | 205/697 [01:45<04:12,  1.95it/s]
+----- stdout -----
+train_batch (3.213):  29%|██▉       | 205/697 [01:46<04:12,  1.95it/s]
+----- stdout -----
+train_batch (3.213):  30%|██▉       | 206/697 [01:46<04:11,  1.95it/s]
+----- stdout -----
+train_batch (3.167):  30%|██▉       | 206/697 [01:46<04:11,  1.95it/s]
+----- stdout -----
+train_batch (3.167):  30%|██▉       | 207/697 [01:46<04:11,  1.95it/s]
+----- stdout -----
+train_batch (3.149):  30%|██▉       | 207/697 [01:47<04:11,  1.95it/s]
+----- stdout -----
+train_batch (3.149):  30%|██▉       | 208/697 [01:47<04:10,  1.95it/s]
+----- stdout -----
+train_batch (3.152):  30%|██▉       | 208/697 [01:47<04:10,  1.95it/s]
+----- stdout -----
+train_batch (3.152):  30%|██▉       | 209/697 [01:47<04:10,  1.95it/s]
+----- stdout -----
+train_batch (3.116):  30%|██▉       | 209/697 [01:48<04:10,  1.95it/s]
+----- stdout -----
+train_batch (3.116):  30%|███       | 210/697 [01:48<04:10,  1.95it/s]
+----- stdout -----
+train_batch (3.210):  30%|███       | 210/697 [01:48<04:10,  1.95it/s]
+----- stdout -----
+train_batch (3.210):  30%|███       | 211/697 [01:48<04:09,  1.95it/s]
+----- stdout -----
+train_batch (3.178):  30%|███       | 211/697 [01:49<04:09,  1.95it/s]
+----- stdout -----
+train_batch (3.178):  30%|███       | 212/697 [01:49<04:08,  1.95it/s]
+----- stdout -----
+train_batch (3.182):  30%|███       | 212/697 [01:49<04:08,  1.95it/s]
+----- stdout -----
+train_batch (3.182):  31%|███       | 213/697 [01:49<04:08,  1.95it/s]
+----- stdout -----
+train_batch (3.156):  31%|███       | 213/697 [01:50<04:08,  1.95it/s]
+----- stdout -----
+train_batch (3.156):  31%|███       | 214/697 [01:50<04:07,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  31%|███       | 214/697 [01:51<04:07,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  31%|███       | 215/697 [01:51<04:07,  1.95it/s]
+----- stdout -----
+train_batch (3.122):  31%|███       | 215/697 [01:51<04:07,  1.95it/s]
+----- stdout -----
+train_batch (3.122):  31%|███       | 216/697 [01:51<04:06,  1.95it/s]
+----- stdout -----
+train_batch (3.207):  31%|███       | 216/697 [01:52<04:06,  1.95it/s]
+----- stdout -----
+train_batch (3.207):  31%|███       | 217/697 [01:52<04:10,  1.92it/s]
+----- stdout -----
+train_batch (3.164):  31%|███       | 217/697 [01:52<04:10,  1.92it/s]
+----- stdout -----
+train_batch (3.164):  31%|███▏      | 218/697 [01:52<04:10,  1.91it/s]
+----- stdout -----
+train_batch (3.180):  31%|███▏      | 218/697 [01:53<04:10,  1.91it/s]
+----- stdout -----
+train_batch (3.180):  31%|███▏      | 219/697 [01:53<04:08,  1.92it/s]
+----- stdout -----
+train_batch (3.174):  31%|███▏      | 219/697 [01:53<04:08,  1.92it/s]
+----- stdout -----
+train_batch (3.174):  32%|███▏      | 220/697 [01:53<04:07,  1.93it/s]
+----- stdout -----
+train_batch (3.161):  32%|███▏      | 220/697 [01:54<04:07,  1.93it/s]
+----- stdout -----
+train_batch (3.161):  32%|███▏      | 221/697 [01:54<04:05,  1.94it/s]
+----- stdout -----
+train_batch (3.157):  32%|███▏      | 221/697 [01:54<04:05,  1.94it/s]
+----- stdout -----
+train_batch (3.157):  32%|███▏      | 222/697 [01:54<04:04,  1.94it/s]
+----- stdout -----
+train_batch (3.172):  32%|███▏      | 222/697 [01:55<04:04,  1.94it/s]
+----- stdout -----
+train_batch (3.172):  32%|███▏      | 223/697 [01:55<04:04,  1.94it/s]
+----- stdout -----
+train_batch (3.163):  32%|███▏      | 223/697 [01:55<04:04,  1.94it/s]
+----- stdout -----
+train_batch (3.163):  32%|███▏      | 224/697 [01:55<04:03,  1.95it/s]
+----- stdout -----
+train_batch (3.131):  32%|███▏      | 224/697 [01:56<04:03,  1.95it/s]
+----- stdout -----
+train_batch (3.131):  32%|███▏      | 225/697 [01:56<04:02,  1.95it/s]
+----- stdout -----
+train_batch (3.192):  32%|███▏      | 225/697 [01:56<04:02,  1.95it/s]
+----- stdout -----
+train_batch (3.192):  32%|███▏      | 226/697 [01:56<04:01,  1.95it/s]
+----- stdout -----
+train_batch (3.144):  32%|███▏      | 226/697 [01:57<04:01,  1.95it/s]
+----- stdout -----
+train_batch (3.144):  33%|███▎      | 227/697 [01:57<04:01,  1.95it/s]
+----- stdout -----
+train_batch (3.153):  33%|███▎      | 227/697 [01:57<04:01,  1.95it/s]
+----- stdout -----
+train_batch (3.153):  33%|███▎      | 228/697 [01:57<04:00,  1.95it/s]
+----- stdout -----
+train_batch (3.185):  33%|███▎      | 228/697 [01:58<04:00,  1.95it/s]
+----- stdout -----
+train_batch (3.185):  33%|███▎      | 229/697 [01:58<03:59,  1.95it/s]
+----- stdout -----
+train_batch (3.187):  33%|███▎      | 229/697 [01:58<03:59,  1.95it/s]
+----- stdout -----
+train_batch (3.187):  33%|███▎      | 230/697 [01:58<03:59,  1.95it/s]
+----- stdout -----
+train_batch (3.190):  33%|███▎      | 230/697 [01:59<03:59,  1.95it/s]
+----- stdout -----
+train_batch (3.190):  33%|███▎      | 231/697 [01:59<03:58,  1.95it/s]
+----- stdout -----
+train_batch (3.157):  33%|███▎      | 231/697 [01:59<03:58,  1.95it/s]
+----- stdout -----
+train_batch (3.157):  33%|███▎      | 232/697 [01:59<03:58,  1.95it/s]
+----- stdout -----
+train_batch (3.178):  33%|███▎      | 232/697 [02:00<03:58,  1.95it/s]
+----- stdout -----
+train_batch (3.178):  33%|███▎      | 233/697 [02:00<03:57,  1.95it/s]
+----- stdout -----
+train_batch (3.191):  33%|███▎      | 233/697 [02:00<03:57,  1.95it/s]
+----- stdout -----
+train_batch (3.191):  34%|███▎      | 234/697 [02:00<03:57,  1.95it/s]
+----- stdout -----
+train_batch (3.132):  34%|███▎      | 234/697 [02:01<03:57,  1.95it/s]
+----- stdout -----
+train_batch (3.132):  34%|███▎      | 235/697 [02:01<03:56,  1.95it/s]
+----- stdout -----
+train_batch (3.190):  34%|███▎      | 235/697 [02:01<03:56,  1.95it/s]
+----- stdout -----
+train_batch (3.190):  34%|███▍      | 236/697 [02:01<03:56,  1.95it/s]
+----- stdout -----
+train_batch (3.191):  34%|███▍      | 236/697 [02:02<03:56,  1.95it/s]
+----- stdout -----
+train_batch (3.191):  34%|███▍      | 237/697 [02:02<03:54,  1.96it/s]
+----- stdout -----
+train_batch (3.222):  34%|███▍      | 237/697 [02:02<03:54,  1.96it/s]
+----- stdout -----
+train_batch (3.222):  34%|███▍      | 238/697 [02:02<03:54,  1.96it/s]
+----- stdout -----
+train_batch (3.179):  34%|███▍      | 238/697 [02:03<03:54,  1.96it/s]
+----- stdout -----
+train_batch (3.179):  34%|███▍      | 239/697 [02:03<03:56,  1.94it/s]
+----- stdout -----
+train_batch (3.253):  34%|███▍      | 239/697 [02:03<03:56,  1.94it/s]
+----- stdout -----
+train_batch (3.253):  34%|███▍      | 240/697 [02:03<03:59,  1.91it/s]
+----- stdout -----
+train_batch (3.194):  34%|███▍      | 240/697 [02:04<03:59,  1.91it/s]
+----- stdout -----
+train_batch (3.194):  35%|███▍      | 241/697 [02:04<04:10,  1.82it/s]
+----- stdout -----
+train_batch (3.193):  35%|███▍      | 241/697 [02:05<04:10,  1.82it/s]
+----- stdout -----
+train_batch (3.193):  35%|███▍      | 242/697 [02:05<04:04,  1.86it/s]
+----- stdout -----
+train_batch (3.196):  35%|███▍      | 242/697 [02:05<04:04,  1.86it/s]
+----- stdout -----
+train_batch (3.196):  35%|███▍      | 243/697 [02:05<04:00,  1.89it/s]
+----- stdout -----
+train_batch (3.142):  35%|███▍      | 243/697 [02:06<04:00,  1.89it/s]
+----- stdout -----
+train_batch (3.142):  35%|███▌      | 244/697 [02:06<03:57,  1.91it/s]
+----- stdout -----
+train_batch (3.165):  35%|███▌      | 244/697 [02:06<03:57,  1.91it/s]
+----- stdout -----
+train_batch (3.165):  35%|███▌      | 245/697 [02:06<03:55,  1.92it/s]
+----- stdout -----
+train_batch (3.154):  35%|███▌      | 245/697 [02:07<03:55,  1.92it/s]
+----- stdout -----
+train_batch (3.154):  35%|███▌      | 246/697 [02:07<03:53,  1.94it/s]
+----- stdout -----
+train_batch (3.196):  35%|███▌      | 246/697 [02:07<03:53,  1.94it/s]
+----- stdout -----
+train_batch (3.196):  35%|███▌      | 247/697 [02:07<03:51,  1.94it/s]
+----- stdout -----
+train_batch (3.154):  35%|███▌      | 247/697 [02:08<03:51,  1.94it/s]
+----- stdout -----
+train_batch (3.154):  36%|███▌      | 248/697 [02:08<03:50,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  36%|███▌      | 248/697 [02:08<03:50,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  36%|███▌      | 249/697 [02:08<03:49,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  36%|███▌      | 249/697 [02:09<03:49,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  36%|███▌      | 250/697 [02:09<03:48,  1.95it/s]
+----- stdout -----
+train_batch (3.165):  36%|███▌      | 250/697 [02:09<03:48,  1.95it/s]
+----- stdout -----
+train_batch (3.165):  36%|███▌      | 251/697 [02:09<03:48,  1.95it/s]
+----- stdout -----
+train_batch (3.154):  36%|███▌      | 251/697 [02:10<03:48,  1.95it/s]
+----- stdout -----
+train_batch (3.154):  36%|███▌      | 252/697 [02:10<03:48,  1.94it/s]
+----- stdout -----
+train_batch (3.163):  36%|███▌      | 252/697 [02:10<03:48,  1.94it/s]
+----- stdout -----
+train_batch (3.163):  36%|███▋      | 253/697 [02:10<03:50,  1.93it/s]
+----- stdout -----
+train_batch (3.174):  36%|███▋      | 253/697 [02:11<03:50,  1.93it/s]
+----- stdout -----
+train_batch (3.174):  36%|███▋      | 254/697 [02:11<03:49,  1.93it/s]
+----- stdout -----
+train_batch (3.189):  36%|███▋      | 254/697 [02:11<03:49,  1.93it/s]
+----- stdout -----
+train_batch (3.189):  37%|███▋      | 255/697 [02:11<03:47,  1.94it/s]
+----- stdout -----
+train_batch (3.199):  37%|███▋      | 255/697 [02:12<03:47,  1.94it/s]
+----- stdout -----
+train_batch (3.199):  37%|███▋      | 256/697 [02:12<03:46,  1.94it/s]
+----- stdout -----
+train_batch (3.232):  37%|███▋      | 256/697 [02:12<03:46,  1.94it/s]
+----- stdout -----
+train_batch (3.232):  37%|███▋      | 257/697 [02:12<03:45,  1.95it/s]
+----- stdout -----
+train_batch (3.213):  37%|███▋      | 257/697 [02:13<03:45,  1.95it/s]
+----- stdout -----
+train_batch (3.213):  37%|███▋      | 258/697 [02:13<03:45,  1.95it/s]
+----- stdout -----
+train_batch (3.163):  37%|███▋      | 258/697 [02:13<03:45,  1.95it/s]
+----- stdout -----
+train_batch (3.163):  37%|███▋      | 259/697 [02:13<03:44,  1.95it/s]
+----- stdout -----
+train_batch (3.178):  37%|███▋      | 259/697 [02:14<03:44,  1.95it/s]
+----- stdout -----
+train_batch (3.178):  37%|███▋      | 260/697 [02:14<03:44,  1.95it/s]
+----- stdout -----
+train_batch (3.177):  37%|███▋      | 260/697 [02:14<03:44,  1.95it/s]
+----- stdout -----
+train_batch (3.177):  37%|███▋      | 261/697 [02:14<03:43,  1.95it/s]
+----- stdout -----
+train_batch (3.175):  37%|███▋      | 261/697 [02:15<03:43,  1.95it/s]
+----- stdout -----
+train_batch (3.175):  38%|███▊      | 262/697 [02:15<03:43,  1.94it/s]
+----- stdout -----
+train_batch (3.117):  38%|███▊      | 262/697 [02:15<03:43,  1.94it/s]
+----- stdout -----
+train_batch (3.117):  38%|███▊      | 263/697 [02:15<03:45,  1.93it/s]
+----- stdout -----
+train_batch (3.189):  38%|███▊      | 263/697 [02:16<03:45,  1.93it/s]
+----- stdout -----
+train_batch (3.189):  38%|███▊      | 264/697 [02:16<03:45,  1.92it/s]
+----- stdout -----
+train_batch (3.173):  38%|███▊      | 264/697 [02:16<03:45,  1.92it/s]
+----- stdout -----
+train_batch (3.173):  38%|███▊      | 265/697 [02:16<03:43,  1.93it/s]
+----- stdout -----
+train_batch (3.151):  38%|███▊      | 265/697 [02:17<03:43,  1.93it/s]
+----- stdout -----
+train_batch (3.151):  38%|███▊      | 266/697 [02:17<03:42,  1.94it/s]
+----- stdout -----
+train_batch (3.161):  38%|███▊      | 266/697 [02:17<03:42,  1.94it/s]
+----- stdout -----
+train_batch (3.161):  38%|███▊      | 267/697 [02:17<03:41,  1.94it/s]
+----- stdout -----
+train_batch (3.181):  38%|███▊      | 267/697 [02:18<03:41,  1.94it/s]
+----- stdout -----
+train_batch (3.181):  38%|███▊      | 268/697 [02:18<03:40,  1.94it/s]
+----- stdout -----
+train_batch (3.114):  38%|███▊      | 268/697 [02:18<03:40,  1.94it/s]
+----- stdout -----
+train_batch (3.114):  39%|███▊      | 269/697 [02:18<03:39,  1.95it/s]
+----- stdout -----
+train_batch (3.238):  39%|███▊      | 269/697 [02:19<03:39,  1.95it/s]
+----- stdout -----
+train_batch (3.238):  39%|███▊      | 270/697 [02:19<03:38,  1.95it/s]
+----- stdout -----
+train_batch (3.212):  39%|███▊      | 270/697 [02:19<03:38,  1.95it/s]
+----- stdout -----
+train_batch (3.212):  39%|███▉      | 271/697 [02:19<03:37,  1.95it/s]
+----- stdout -----
+train_batch (3.212):  39%|███▉      | 271/697 [02:20<03:37,  1.95it/s]
+----- stdout -----
+train_batch (3.212):  39%|███▉      | 272/697 [02:20<03:36,  1.96it/s]
+----- stdout -----
+train_batch (3.187):  39%|███▉      | 272/697 [02:20<03:36,  1.96it/s]
+----- stdout -----
+train_batch (3.187):  39%|███▉      | 273/697 [02:20<03:36,  1.96it/s]
+----- stdout -----
+train_batch (3.172):  39%|███▉      | 273/697 [02:21<03:36,  1.96it/s]
+----- stdout -----
+train_batch (3.172):  39%|███▉      | 274/697 [02:21<03:36,  1.96it/s]
+----- stdout -----
+train_batch (3.132):  39%|███▉      | 274/697 [02:21<03:36,  1.96it/s]
+----- stdout -----
+train_batch (3.132):  39%|███▉      | 275/697 [02:21<03:35,  1.96it/s]
+----- stdout -----
+train_batch (3.132):  39%|███▉      | 275/697 [02:22<03:35,  1.96it/s]
+----- stdout -----
+train_batch (3.132):  40%|███▉      | 276/697 [02:22<03:35,  1.96it/s]
+----- stdout -----
+train_batch (3.152):  40%|███▉      | 276/697 [02:22<03:35,  1.96it/s]
+----- stdout -----
+train_batch (3.152):  40%|███▉      | 277/697 [02:22<03:33,  1.96it/s]
+----- stdout -----
+train_batch (3.156):  40%|███▉      | 277/697 [02:23<03:33,  1.96it/s]
+----- stdout -----
+train_batch (3.156):  40%|███▉      | 278/697 [02:23<03:32,  1.97it/s]
+----- stdout -----
+train_batch (3.182):  40%|███▉      | 278/697 [02:23<03:32,  1.97it/s]
+----- stdout -----
+train_batch (3.182):  40%|████      | 279/697 [02:23<03:32,  1.97it/s]
+----- stdout -----
+train_batch (3.188):  40%|████      | 279/697 [02:24<03:32,  1.97it/s]
+----- stdout -----
+train_batch (3.188):  40%|████      | 280/697 [02:24<03:32,  1.97it/s]
+----- stdout -----
+train_batch (3.189):  40%|████      | 280/697 [02:25<03:32,  1.97it/s]
+----- stdout -----
+train_batch (3.189):  40%|████      | 281/697 [02:25<03:31,  1.97it/s]
+----- stdout -----
+train_batch (3.148):  40%|████      | 281/697 [02:25<03:31,  1.97it/s]
+----- stdout -----
+train_batch (3.148):  40%|████      | 282/697 [02:25<03:30,  1.97it/s]
+----- stdout -----
+train_batch (3.196):  40%|████      | 282/697 [02:26<03:30,  1.97it/s]
+----- stdout -----
+train_batch (3.196):  41%|████      | 283/697 [02:26<03:30,  1.97it/s]
+----- stdout -----
+train_batch (3.185):  41%|████      | 283/697 [02:26<03:30,  1.97it/s]
+----- stdout -----
+train_batch (3.185):  41%|████      | 284/697 [02:26<03:30,  1.97it/s]
+----- stdout -----
+train_batch (3.156):  41%|████      | 284/697 [02:27<03:30,  1.97it/s]
+----- stdout -----
+train_batch (3.156):  41%|████      | 285/697 [02:27<03:30,  1.96it/s]
+----- stdout -----
+train_batch (3.162):  41%|████      | 285/697 [02:27<03:30,  1.96it/s]
+----- stdout -----
+train_batch (3.162):  41%|████      | 286/697 [02:27<03:31,  1.95it/s]
+----- stdout -----
+train_batch (3.160):  41%|████      | 286/697 [02:28<03:31,  1.95it/s]
+----- stdout -----
+train_batch (3.160):  41%|████      | 287/697 [02:28<03:32,  1.93it/s]
+----- stdout -----
+train_batch (3.184):  41%|████      | 287/697 [02:28<03:32,  1.93it/s]
+----- stdout -----
+train_batch (3.184):  41%|████▏     | 288/697 [02:28<03:32,  1.93it/s]
+----- stdout -----
+train_batch (3.196):  41%|████▏     | 288/697 [02:29<03:32,  1.93it/s]
+----- stdout -----
+train_batch (3.196):  41%|████▏     | 289/697 [02:29<03:30,  1.94it/s]
+----- stdout -----
+train_batch (3.143):  41%|████▏     | 289/697 [02:29<03:30,  1.94it/s]
+----- stdout -----
+train_batch (3.143):  42%|████▏     | 290/697 [02:29<03:30,  1.94it/s]
+----- stdout -----
+train_batch (3.202):  42%|████▏     | 290/697 [02:30<03:30,  1.94it/s]
+----- stdout -----
+train_batch (3.202):  42%|████▏     | 291/697 [02:30<03:29,  1.94it/s]
+----- stdout -----
+train_batch (3.197):  42%|████▏     | 291/697 [02:30<03:29,  1.94it/s]
+----- stdout -----
+train_batch (3.197):  42%|████▏     | 292/697 [02:30<03:30,  1.93it/s]
+----- stdout -----
+train_batch (3.178):  42%|████▏     | 292/697 [02:31<03:30,  1.93it/s]
+----- stdout -----
+train_batch (3.178):  42%|████▏     | 293/697 [02:31<03:28,  1.94it/s]
+----- stdout -----
+train_batch (3.201):  42%|████▏     | 293/697 [02:31<03:28,  1.94it/s]
+----- stdout -----
+train_batch (3.201):  42%|████▏     | 294/697 [02:31<03:27,  1.94it/s]
+----- stdout -----
+train_batch (3.175):  42%|████▏     | 294/697 [02:32<03:27,  1.94it/s]
+----- stdout -----
+train_batch (3.175):  42%|████▏     | 295/697 [02:32<03:26,  1.94it/s]
+----- stdout -----
+train_batch (3.159):  42%|████▏     | 295/697 [02:32<03:26,  1.94it/s]
+----- stdout -----
+train_batch (3.159):  42%|████▏     | 296/697 [02:32<03:25,  1.95it/s]
+----- stdout -----
+train_batch (3.192):  42%|████▏     | 296/697 [02:33<03:25,  1.95it/s]
+----- stdout -----
+train_batch (3.192):  43%|████▎     | 297/697 [02:33<03:25,  1.95it/s]
+----- stdout -----
+train_batch (3.184):  43%|████▎     | 297/697 [02:33<03:25,  1.95it/s]
+----- stdout -----
+train_batch (3.184):  43%|████▎     | 298/697 [02:33<03:30,  1.90it/s]
+----- stdout -----
+train_batch (3.185):  43%|████▎     | 298/697 [02:34<03:30,  1.90it/s]
+----- stdout -----
+train_batch (3.185):  43%|████▎     | 299/697 [02:34<03:28,  1.91it/s]
+----- stdout -----
+train_batch (3.131):  43%|████▎     | 299/697 [02:34<03:28,  1.91it/s]
+----- stdout -----
+train_batch (3.131):  43%|████▎     | 300/697 [02:34<03:26,  1.93it/s]
+----- stdout -----
+train_batch (3.200):  43%|████▎     | 300/697 [02:35<03:26,  1.93it/s]
+----- stdout -----
+train_batch (3.200):  43%|████▎     | 301/697 [02:35<03:24,  1.93it/s]
+----- stdout -----
+train_batch (3.182):  43%|████▎     | 301/697 [02:35<03:24,  1.93it/s]
+----- stdout -----
+train_batch (3.182):  43%|████▎     | 302/697 [02:35<03:23,  1.94it/s]
+----- stdout -----
+train_batch (3.139):  43%|████▎     | 302/697 [02:36<03:23,  1.94it/s]
+----- stdout -----
+train_batch (3.139):  43%|████▎     | 303/697 [02:36<03:22,  1.95it/s]
+----- stdout -----
+train_batch (3.201):  43%|████▎     | 303/697 [02:36<03:22,  1.95it/s]
+----- stdout -----
+train_batch (3.201):  44%|████▎     | 304/697 [02:36<03:21,  1.95it/s]
+----- stdout -----
+train_batch (3.161):  44%|████▎     | 304/697 [02:37<03:21,  1.95it/s]
+----- stdout -----
+train_batch (3.161):  44%|████▍     | 305/697 [02:37<03:21,  1.95it/s]
+----- stdout -----
+train_batch (3.200):  44%|████▍     | 305/697 [02:37<03:21,  1.95it/s]
+----- stdout -----
+train_batch (3.200):  44%|████▍     | 306/697 [02:37<03:21,  1.95it/s]
+----- stdout -----
+train_batch (3.195):  44%|████▍     | 306/697 [02:38<03:21,  1.95it/s]
+----- stdout -----
+train_batch (3.195):  44%|████▍     | 307/697 [02:38<03:19,  1.95it/s]
+----- stdout -----
+train_batch (3.162):  44%|████▍     | 307/697 [02:38<03:19,  1.95it/s]
+----- stdout -----
+train_batch (3.162):  44%|████▍     | 308/697 [02:38<03:19,  1.95it/s]
+----- stdout -----
+train_batch (3.186):  44%|████▍     | 308/697 [02:39<03:19,  1.95it/s]
+----- stdout -----
+train_batch (3.186):  44%|████▍     | 309/697 [02:39<03:20,  1.94it/s]
+----- stdout -----
+train_batch (3.163):  44%|████▍     | 309/697 [02:39<03:20,  1.94it/s]
+----- stdout -----
+train_batch (3.163):  44%|████▍     | 310/697 [02:39<03:22,  1.91it/s]
+----- stdout -----
+train_batch (3.226):  44%|████▍     | 310/697 [02:40<03:22,  1.91it/s]
+----- stdout -----
+train_batch (3.226):  45%|████▍     | 311/697 [02:40<03:20,  1.93it/s]
+----- stdout -----
+train_batch (3.162):  45%|████▍     | 311/697 [02:41<03:20,  1.93it/s]
+----- stdout -----
+train_batch (3.162):  45%|████▍     | 312/697 [02:41<03:18,  1.94it/s]
+----- stdout -----
+train_batch (3.176):  45%|████▍     | 312/697 [02:41<03:18,  1.94it/s]
+----- stdout -----
+train_batch (3.176):  45%|████▍     | 313/697 [02:41<03:16,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  45%|████▍     | 313/697 [02:42<03:16,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  45%|████▌     | 314/697 [02:42<03:15,  1.96it/s]
+----- stdout -----
+train_batch (3.164):  45%|████▌     | 314/697 [02:42<03:15,  1.96it/s]
+----- stdout -----
+train_batch (3.164):  45%|████▌     | 315/697 [02:42<03:15,  1.96it/s]
+----- stdout -----
+train_batch (3.175):  45%|████▌     | 315/697 [02:43<03:15,  1.96it/s]
+----- stdout -----
+train_batch (3.175):  45%|████▌     | 316/697 [02:43<03:15,  1.95it/s]
+----- stdout -----
+train_batch (3.159):  45%|████▌     | 316/697 [02:43<03:15,  1.95it/s]
+----- stdout -----
+train_batch (3.159):  45%|████▌     | 317/697 [02:43<03:15,  1.95it/s]
+----- stdout -----
+train_batch (3.148):  45%|████▌     | 317/697 [02:44<03:15,  1.95it/s]
+----- stdout -----
+train_batch (3.148):  46%|████▌     | 318/697 [02:44<03:14,  1.95it/s]
+----- stdout -----
+train_batch (3.157):  46%|████▌     | 318/697 [02:44<03:14,  1.95it/s]
+----- stdout -----
+train_batch (3.157):  46%|████▌     | 319/697 [02:44<03:13,  1.95it/s]
+----- stdout -----
+train_batch (3.215):  46%|████▌     | 319/697 [02:45<03:13,  1.95it/s]
+----- stdout -----
+train_batch (3.215):  46%|████▌     | 320/697 [02:45<03:13,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  46%|████▌     | 320/697 [02:45<03:13,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  46%|████▌     | 321/697 [02:45<03:12,  1.95it/s]
+----- stdout -----
+train_batch (3.201):  46%|████▌     | 321/697 [02:46<03:12,  1.95it/s]
+----- stdout -----
+train_batch (3.201):  46%|████▌     | 322/697 [02:46<03:11,  1.96it/s]
+----- stdout -----
+train_batch (3.183):  46%|████▌     | 322/697 [02:46<03:11,  1.96it/s]
+----- stdout -----
+train_batch (3.183):  46%|████▋     | 323/697 [02:46<03:11,  1.96it/s]
+----- stdout -----
+train_batch (3.160):  46%|████▋     | 323/697 [02:47<03:11,  1.96it/s]
+----- stdout -----
+train_batch (3.160):  46%|████▋     | 324/697 [02:47<03:10,  1.96it/s]
+----- stdout -----
+train_batch (3.180):  46%|████▋     | 324/697 [02:47<03:10,  1.96it/s]
+----- stdout -----
+train_batch (3.180):  47%|████▋     | 325/697 [02:47<03:10,  1.96it/s]
+----- stdout -----
+train_batch (3.172):  47%|████▋     | 325/697 [02:48<03:10,  1.96it/s]
+----- stdout -----
+train_batch (3.172):  47%|████▋     | 326/697 [02:48<03:10,  1.95it/s]
+----- stdout -----
+train_batch (3.189):  47%|████▋     | 326/697 [02:48<03:10,  1.95it/s]
+----- stdout -----
+train_batch (3.189):  47%|████▋     | 327/697 [02:48<03:09,  1.95it/s]
+----- stdout -----
+train_batch (3.190):  47%|████▋     | 327/697 [02:49<03:09,  1.95it/s]
+----- stdout -----
+train_batch (3.190):  47%|████▋     | 328/697 [02:49<03:09,  1.95it/s]
+----- stdout -----
+train_batch (3.173):  47%|████▋     | 328/697 [02:49<03:09,  1.95it/s]
+----- stdout -----
+train_batch (3.173):  47%|████▋     | 329/697 [02:49<03:08,  1.95it/s]
+----- stdout -----
+train_batch (3.179):  47%|████▋     | 329/697 [02:50<03:08,  1.95it/s]
+----- stdout -----
+train_batch (3.179):  47%|████▋     | 330/697 [02:50<03:07,  1.96it/s]
+----- stdout -----
+train_batch (3.170):  47%|████▋     | 330/697 [02:50<03:07,  1.96it/s]
+----- stdout -----
+train_batch (3.170):  47%|████▋     | 331/697 [02:50<03:07,  1.95it/s]
+----- stdout -----
+train_batch (3.180):  47%|████▋     | 331/697 [02:51<03:07,  1.95it/s]
+----- stdout -----
+train_batch (3.180):  48%|████▊     | 332/697 [02:51<03:08,  1.94it/s]
+----- stdout -----
+train_batch (3.173):  48%|████▊     | 332/697 [02:51<03:08,  1.94it/s]
+----- stdout -----
+train_batch (3.173):  48%|████▊     | 333/697 [02:51<03:10,  1.91it/s]
+----- stdout -----
+train_batch (3.192):  48%|████▊     | 333/697 [02:52<03:10,  1.91it/s]
+----- stdout -----
+train_batch (3.192):  48%|████▊     | 334/697 [02:52<03:09,  1.92it/s]
+----- stdout -----
+train_batch (3.189):  48%|████▊     | 334/697 [02:52<03:09,  1.92it/s]
+----- stdout -----
+train_batch (3.189):  48%|████▊     | 335/697 [02:52<03:07,  1.93it/s]
+----- stdout -----
+train_batch (3.164):  48%|████▊     | 335/697 [02:53<03:07,  1.93it/s]
+----- stdout -----
+train_batch (3.164):  48%|████▊     | 336/697 [02:53<03:08,  1.91it/s]
+----- stdout -----
+train_batch (3.173):  48%|████▊     | 336/697 [02:53<03:08,  1.91it/s]
+----- stdout -----
+train_batch (3.173):  48%|████▊     | 337/697 [02:53<03:07,  1.92it/s]
+----- stdout -----
+train_batch (3.164):  48%|████▊     | 337/697 [02:54<03:07,  1.92it/s]
+----- stdout -----
+train_batch (3.164):  48%|████▊     | 338/697 [02:54<03:05,  1.93it/s]
+----- stdout -----
+train_batch (3.170):  48%|████▊     | 338/697 [02:54<03:05,  1.93it/s]
+----- stdout -----
+train_batch (3.170):  49%|████▊     | 339/697 [02:54<03:04,  1.94it/s]
+----- stdout -----
+train_batch (3.159):  49%|████▊     | 339/697 [02:55<03:04,  1.94it/s]
+----- stdout -----
+train_batch (3.159):  49%|████▉     | 340/697 [02:55<03:03,  1.94it/s]
+----- stdout -----
+train_batch (3.185):  49%|████▉     | 340/697 [02:55<03:03,  1.94it/s]
+----- stdout -----
+train_batch (3.185):  49%|████▉     | 341/697 [02:55<03:02,  1.95it/s]
+----- stdout -----
+train_batch (3.171):  49%|████▉     | 341/697 [02:56<03:02,  1.95it/s]
+----- stdout -----
+train_batch (3.171):  49%|████▉     | 342/697 [02:56<03:02,  1.95it/s]
+----- stdout -----
+train_batch (3.128):  49%|████▉     | 342/697 [02:56<03:02,  1.95it/s]
+----- stdout -----
+train_batch (3.128):  49%|████▉     | 343/697 [02:56<03:02,  1.94it/s]
+----- stdout -----
+train_batch (3.214):  49%|████▉     | 343/697 [02:57<03:02,  1.94it/s]
+----- stdout -----
+train_batch (3.214):  49%|████▉     | 344/697 [02:57<03:02,  1.94it/s]
+----- stdout -----
+train_batch (3.191):  49%|████▉     | 344/697 [02:57<03:02,  1.94it/s]
+----- stdout -----
+train_batch (3.191):  49%|████▉     | 345/697 [02:57<03:01,  1.94it/s]
+----- stdout -----
+train_batch (3.147):  49%|████▉     | 345/697 [02:58<03:01,  1.94it/s]
+----- stdout -----
+train_batch (3.147):  50%|████▉     | 346/697 [02:58<03:00,  1.94it/s]
+----- stdout -----
+train_batch (3.202):  50%|████▉     | 346/697 [02:59<03:00,  1.94it/s]
+----- stdout -----
+train_batch (3.202):  50%|████▉     | 347/697 [02:59<03:00,  1.94it/s]
+----- stdout -----
+train_batch (3.223):  50%|████▉     | 347/697 [02:59<03:00,  1.94it/s]
+----- stdout -----
+train_batch (3.223):  50%|████▉     | 348/697 [02:59<02:59,  1.95it/s]
+----- stdout -----
+train_batch (3.235):  50%|████▉     | 348/697 [03:00<02:59,  1.95it/s]
+----- stdout -----
+train_batch (3.235):  50%|█████     | 349/697 [03:00<02:58,  1.95it/s]
+----- stdout -----
+train_batch (3.162):  50%|█████     | 349/697 [03:00<02:58,  1.95it/s]
+----- stdout -----
+train_batch (3.162):  50%|█████     | 350/697 [03:00<02:57,  1.95it/s]
+----- stdout -----
+train_batch (3.169):  50%|█████     | 350/697 [03:01<02:57,  1.95it/s]
+----- stdout -----
+train_batch (3.169):  50%|█████     | 351/697 [03:01<02:57,  1.95it/s]
+----- stdout -----
+train_batch (3.217):  50%|█████     | 351/697 [03:01<02:57,  1.95it/s]
+----- stdout -----
+train_batch (3.217):  51%|█████     | 352/697 [03:01<02:56,  1.96it/s]
+----- stdout -----
+train_batch (3.170):  51%|█████     | 352/697 [03:02<02:56,  1.96it/s]
+----- stdout -----
+train_batch (3.170):  51%|█████     | 353/697 [03:02<02:56,  1.95it/s]
+----- stdout -----
+train_batch (3.164):  51%|█████     | 353/697 [03:02<02:56,  1.95it/s]
+----- stdout -----
+train_batch (3.164):  51%|█████     | 354/697 [03:02<02:56,  1.95it/s]
+----- stdout -----
+train_batch (3.165):  51%|█████     | 354/697 [03:03<02:56,  1.95it/s]
+----- stdout -----
+train_batch (3.165):  51%|█████     | 355/697 [03:03<02:56,  1.94it/s]
+----- stdout -----
+train_batch (3.123):  51%|█████     | 355/697 [03:03<02:56,  1.94it/s]
+----- stdout -----
+train_batch (3.123):  51%|█████     | 356/697 [03:03<02:57,  1.92it/s]
+----- stdout -----
+train_batch (3.165):  51%|█████     | 356/697 [03:04<02:57,  1.92it/s]
+----- stdout -----
+train_batch (3.165):  51%|█████     | 357/697 [03:04<02:55,  1.93it/s]
+----- stdout -----
+train_batch (3.204):  51%|█████     | 357/697 [03:04<02:55,  1.93it/s]
+----- stdout -----
+train_batch (3.204):  51%|█████▏    | 358/697 [03:04<02:54,  1.94it/s]
+----- stdout -----
+train_batch (3.160):  51%|█████▏    | 358/697 [03:05<02:54,  1.94it/s]
+----- stdout -----
+train_batch (3.160):  52%|█████▏    | 359/697 [03:05<03:01,  1.86it/s]
+----- stdout -----
+train_batch (3.175):  52%|█████▏    | 359/697 [03:05<03:01,  1.86it/s]
+----- stdout -----
+train_batch (3.175):  52%|█████▏    | 360/697 [03:05<02:58,  1.89it/s]
+----- stdout -----
+train_batch (3.205):  52%|█████▏    | 360/697 [03:06<02:58,  1.89it/s]
+----- stdout -----
+train_batch (3.205):  52%|█████▏    | 361/697 [03:06<02:55,  1.91it/s]
+----- stdout -----
+train_batch (3.149):  52%|█████▏    | 361/697 [03:06<02:55,  1.91it/s]
+----- stdout -----
+train_batch (3.149):  52%|█████▏    | 362/697 [03:06<02:54,  1.92it/s]
+----- stdout -----
+train_batch (3.167):  52%|█████▏    | 362/697 [03:07<02:54,  1.92it/s]
+----- stdout -----
+train_batch (3.167):  52%|█████▏    | 363/697 [03:07<02:52,  1.93it/s]
+----- stdout -----
+train_batch (3.203):  52%|█████▏    | 363/697 [03:07<02:52,  1.93it/s]
+----- stdout -----
+train_batch (3.203):  52%|█████▏    | 364/697 [03:07<02:51,  1.94it/s]
+----- stdout -----
+train_batch (3.172):  52%|█████▏    | 364/697 [03:08<02:51,  1.94it/s]
+----- stdout -----
+train_batch (3.172):  52%|█████▏    | 365/697 [03:08<02:50,  1.94it/s]
+----- stdout -----
+train_batch (3.169):  52%|█████▏    | 365/697 [03:08<02:50,  1.94it/s]
+----- stdout -----
+train_batch (3.169):  53%|█████▎    | 366/697 [03:08<02:50,  1.94it/s]
+----- stdout -----
+train_batch (3.138):  53%|█████▎    | 366/697 [03:09<02:50,  1.94it/s]
+----- stdout -----
+train_batch (3.138):  53%|█████▎    | 367/697 [03:09<02:49,  1.95it/s]
+----- stdout -----
+train_batch (3.163):  53%|█████▎    | 367/697 [03:09<02:49,  1.95it/s]
+----- stdout -----
+train_batch (3.163):  53%|█████▎    | 368/697 [03:09<02:48,  1.95it/s]
+----- stdout -----
+train_batch (3.195):  53%|█████▎    | 368/697 [03:10<02:48,  1.95it/s]
+----- stdout -----
+train_batch (3.195):  53%|█████▎    | 369/697 [03:10<02:48,  1.95it/s]
+----- stdout -----
+train_batch (3.180):  53%|█████▎    | 369/697 [03:10<02:48,  1.95it/s]
+----- stdout -----
+train_batch (3.180):  53%|█████▎    | 370/697 [03:10<02:47,  1.95it/s]
+----- stdout -----
+train_batch (3.184):  53%|█████▎    | 370/697 [03:11<02:47,  1.95it/s]
+----- stdout -----
+train_batch (3.184):  53%|█████▎    | 371/697 [03:11<02:47,  1.95it/s]
+----- stdout -----
+train_batch (3.164):  53%|█████▎    | 371/697 [03:11<02:47,  1.95it/s]
+----- stdout -----
+train_batch (3.164):  53%|█████▎    | 372/697 [03:11<02:46,  1.95it/s]
+----- stdout -----
+train_batch (3.156):  53%|█████▎    | 372/697 [03:12<02:46,  1.95it/s]
+----- stdout -----
+train_batch (3.156):  54%|█████▎    | 373/697 [03:12<02:45,  1.95it/s]
+----- stdout -----
+train_batch (3.192):  54%|█████▎    | 373/697 [03:12<02:45,  1.95it/s]
+----- stdout -----
+train_batch (3.192):  54%|█████▎    | 374/697 [03:12<02:45,  1.95it/s]
+----- stdout -----
+train_batch (3.192):  54%|█████▎    | 374/697 [03:13<02:45,  1.95it/s]
+----- stdout -----
+train_batch (3.192):  54%|█████▍    | 375/697 [03:13<02:44,  1.95it/s]
+----- stdout -----
+train_batch (3.180):  54%|█████▍    | 375/697 [03:13<02:44,  1.95it/s]
+----- stdout -----
+train_batch (3.180):  54%|█████▍    | 376/697 [03:13<02:44,  1.95it/s]
+----- stdout -----
+train_batch (3.186):  54%|█████▍    | 376/697 [03:14<02:44,  1.95it/s]
+----- stdout -----
+train_batch (3.186):  54%|█████▍    | 377/697 [03:14<02:45,  1.94it/s]
+----- stdout -----
+train_batch (3.159):  54%|█████▍    | 377/697 [03:15<02:45,  1.94it/s]
+----- stdout -----
+train_batch (3.159):  54%|█████▍    | 378/697 [03:15<02:47,  1.91it/s]
+----- stdout -----
+train_batch (3.158):  54%|█████▍    | 378/697 [03:15<02:47,  1.91it/s]
+----- stdout -----
+train_batch (3.158):  54%|█████▍    | 379/697 [03:15<02:47,  1.90it/s]
+----- stdout -----
+train_batch (3.159):  54%|█████▍    | 379/697 [03:16<02:47,  1.90it/s]
+----- stdout -----
+train_batch (3.159):  55%|█████▍    | 380/697 [03:16<02:45,  1.92it/s]
+----- stdout -----
+train_batch (3.180):  55%|█████▍    | 380/697 [03:16<02:45,  1.92it/s]
+----- stdout -----
+train_batch (3.180):  55%|█████▍    | 381/697 [03:16<02:43,  1.93it/s]
+----- stdout -----
+train_batch (3.183):  55%|█████▍    | 381/697 [03:17<02:43,  1.93it/s]
+----- stdout -----
+train_batch (3.183):  55%|█████▍    | 382/697 [03:17<02:42,  1.94it/s]
+----- stdout -----
+train_batch (3.205):  55%|█████▍    | 382/697 [03:17<02:42,  1.94it/s]
+----- stdout -----
+train_batch (3.205):  55%|█████▍    | 383/697 [03:17<02:41,  1.94it/s]
+----- stdout -----
+train_batch (3.164):  55%|█████▍    | 383/697 [03:18<02:41,  1.94it/s]
+----- stdout -----
+train_batch (3.164):  55%|█████▌    | 384/697 [03:18<02:40,  1.95it/s]
+----- stdout -----
+train_batch (3.193):  55%|█████▌    | 384/697 [03:18<02:40,  1.95it/s]
+----- stdout -----
+train_batch (3.193):  55%|█████▌    | 385/697 [03:18<02:40,  1.95it/s]
+----- stdout -----
+train_batch (3.182):  55%|█████▌    | 385/697 [03:19<02:40,  1.95it/s]
+----- stdout -----
+train_batch (3.182):  55%|█████▌    | 386/697 [03:19<02:39,  1.95it/s]
+----- stdout -----
+train_batch (3.156):  55%|█████▌    | 386/697 [03:19<02:39,  1.95it/s]
+----- stdout -----
+train_batch (3.156):  56%|█████▌    | 387/697 [03:19<02:38,  1.95it/s]
+----- stdout -----
+train_batch (3.155):  56%|█████▌    | 387/697 [03:20<02:38,  1.95it/s]
+----- stdout -----
+train_batch (3.155):  56%|█████▌    | 388/697 [03:20<02:38,  1.95it/s]
+----- stdout -----
+train_batch (3.150):  56%|█████▌    | 388/697 [03:20<02:38,  1.95it/s]
+----- stdout -----
+train_batch (3.150):  56%|█████▌    | 389/697 [03:20<02:37,  1.95it/s]
+----- stdout -----
+train_batch (3.259):  56%|█████▌    | 389/697 [03:21<02:37,  1.95it/s]
+----- stdout -----
+train_batch (3.259):  56%|█████▌    | 390/697 [03:21<02:37,  1.95it/s]
+----- stdout -----
+train_batch (3.162):  56%|█████▌    | 390/697 [03:21<02:37,  1.95it/s]
+----- stdout -----
+train_batch (3.162):  56%|█████▌    | 391/697 [03:21<02:36,  1.95it/s]
+----- stdout -----
+train_batch (3.158):  56%|█████▌    | 391/697 [03:22<02:36,  1.95it/s]
+----- stdout -----
+train_batch (3.158):  56%|█████▌    | 392/697 [03:22<02:35,  1.96it/s]
+----- stdout -----
+train_batch (3.175):  56%|█████▌    | 392/697 [03:22<02:35,  1.96it/s]
+----- stdout -----
+train_batch (3.175):  56%|█████▋    | 393/697 [03:22<02:35,  1.96it/s]
+----- stdout -----
+train_batch (3.193):  56%|█████▋    | 393/697 [03:23<02:35,  1.96it/s]
+----- stdout -----
+train_batch (3.193):  57%|█████▋    | 394/697 [03:23<02:34,  1.95it/s]
+----- stdout -----
+train_batch (3.224):  57%|█████▋    | 394/697 [03:23<02:34,  1.95it/s]
+----- stdout -----
+train_batch (3.224):  57%|█████▋    | 395/697 [03:23<02:34,  1.95it/s]
+----- stdout -----
+train_batch (3.177):  57%|█████▋    | 395/697 [03:24<02:34,  1.95it/s]
+----- stdout -----
+train_batch (3.177):  57%|█████▋    | 396/697 [03:24<02:34,  1.95it/s]
+----- stdout -----
+train_batch (3.157):  57%|█████▋    | 396/697 [03:24<02:34,  1.95it/s]
+----- stdout -----
+train_batch (3.157):  57%|█████▋    | 397/697 [03:24<02:33,  1.95it/s]
+----- stdout -----
+train_batch (3.175):  57%|█████▋    | 397/697 [03:25<02:33,  1.95it/s]
+----- stdout -----
+train_batch (3.175):  57%|█████▋    | 398/697 [03:25<02:33,  1.95it/s]
+----- stdout -----
+train_batch (3.190):  57%|█████▋    | 398/697 [03:25<02:33,  1.95it/s]
+----- stdout -----
+train_batch (3.190):  57%|█████▋    | 399/697 [03:25<02:32,  1.95it/s]
+----- stdout -----
+train_batch (3.221):  57%|█████▋    | 399/697 [03:26<02:32,  1.95it/s]
+----- stdout -----
+train_batch (3.221):  57%|█████▋    | 400/697 [03:26<02:32,  1.95it/s]
+----- stdout -----
+train_batch (3.183):  57%|█████▋    | 400/697 [03:26<02:32,  1.95it/s]
+----- stdout -----
+train_batch (3.183):  58%|█████▊    | 401/697 [03:26<02:34,  1.92it/s]
+----- stdout -----
+train_batch (3.185):  58%|█████▊    | 401/697 [03:27<02:34,  1.92it/s]
+----- stdout -----
+train_batch (3.185):  58%|█████▊    | 402/697 [03:27<02:33,  1.92it/s]
+----- stdout -----
+train_batch (3.163):  58%|█████▊    | 402/697 [03:27<02:33,  1.92it/s]
+----- stdout -----
+train_batch (3.163):  58%|█████▊    | 403/697 [03:27<02:32,  1.92it/s]
+----- stdout -----
+train_batch (3.196):  58%|█████▊    | 403/697 [03:28<02:32,  1.92it/s]
+----- stdout -----
+train_batch (3.196):  58%|█████▊    | 404/697 [03:28<02:31,  1.93it/s]
+----- stdout -----
+train_batch (3.144):  58%|█████▊    | 404/697 [03:28<02:31,  1.93it/s]
+----- stdout -----
+train_batch (3.144):  58%|█████▊    | 405/697 [03:28<02:30,  1.94it/s]
+----- stdout -----
+train_batch (3.193):  58%|█████▊    | 405/697 [03:29<02:30,  1.94it/s]
+----- stdout -----
+train_batch (3.193):  58%|█████▊    | 406/697 [03:29<02:29,  1.94it/s]
+----- stdout -----
+train_batch (3.175):  58%|█████▊    | 406/697 [03:29<02:29,  1.94it/s]
+----- stdout -----
+train_batch (3.175):  58%|█████▊    | 407/697 [03:29<02:29,  1.94it/s]
+----- stdout -----
+train_batch (3.153):  58%|█████▊    | 407/697 [03:30<02:29,  1.94it/s]
+----- stdout -----
+train_batch (3.153):  59%|█████▊    | 408/697 [03:30<02:28,  1.95it/s]
+----- stdout -----
+train_batch (3.141):  59%|█████▊    | 408/697 [03:30<02:28,  1.95it/s]
+----- stdout -----
+train_batch (3.141):  59%|█████▊    | 409/697 [03:30<02:27,  1.95it/s]
+----- stdout -----
+train_batch (3.139):  59%|█████▊    | 409/697 [03:31<02:27,  1.95it/s]
+----- stdout -----
+train_batch (3.139):  59%|█████▉    | 410/697 [03:31<02:27,  1.95it/s]
+----- stdout -----
+train_batch (3.166):  59%|█████▉    | 410/697 [03:31<02:27,  1.95it/s]
+----- stdout -----
+train_batch (3.166):  59%|█████▉    | 411/697 [03:31<02:26,  1.95it/s]
+----- stdout -----
+train_batch (3.212):  59%|█████▉    | 411/697 [03:32<02:26,  1.95it/s]
+----- stdout -----
+train_batch (3.212):  59%|█████▉    | 412/697 [03:32<02:26,  1.95it/s]
+----- stdout -----
+train_batch (3.134):  59%|█████▉    | 412/697 [03:32<02:26,  1.95it/s]
+----- stdout -----
+train_batch (3.134):  59%|█████▉    | 413/697 [03:32<02:25,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  59%|█████▉    | 413/697 [03:33<02:25,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  59%|█████▉    | 414/697 [03:33<02:24,  1.95it/s]
+----- stdout -----
+train_batch (3.175):  59%|█████▉    | 414/697 [03:34<02:24,  1.95it/s]
+----- stdout -----
+train_batch (3.175):  60%|█████▉    | 415/697 [03:34<02:24,  1.95it/s]
+----- stdout -----
+train_batch (3.143):  60%|█████▉    | 415/697 [03:34<02:24,  1.95it/s]
+----- stdout -----
+train_batch (3.143):  60%|█████▉    | 416/697 [03:34<02:28,  1.89it/s]
+----- stdout -----
+train_batch (3.174):  60%|█████▉    | 416/697 [03:35<02:28,  1.89it/s]
+----- stdout -----
+train_batch (3.174):  60%|█████▉    | 417/697 [03:35<02:26,  1.91it/s]
+----- stdout -----
+train_batch (3.147):  60%|█████▉    | 417/697 [03:35<02:26,  1.91it/s]
+----- stdout -----
+train_batch (3.147):  60%|█████▉    | 418/697 [03:35<02:25,  1.92it/s]
+----- stdout -----
+train_batch (3.190):  60%|█████▉    | 418/697 [03:36<02:25,  1.92it/s]
+----- stdout -----
+train_batch (3.190):  60%|██████    | 419/697 [03:36<02:23,  1.93it/s]
+----- stdout -----
+train_batch (3.168):  60%|██████    | 419/697 [03:36<02:23,  1.93it/s]
+----- stdout -----
+train_batch (3.168):  60%|██████    | 420/697 [03:36<02:23,  1.94it/s]
+----- stdout -----
+train_batch (3.188):  60%|██████    | 420/697 [03:37<02:23,  1.94it/s]
+----- stdout -----
+train_batch (3.188):  60%|██████    | 421/697 [03:37<02:22,  1.94it/s]
+----- stdout -----
+train_batch (3.157):  60%|██████    | 421/697 [03:37<02:22,  1.94it/s]
+----- stdout -----
+train_batch (3.157):  61%|██████    | 422/697 [03:37<02:21,  1.95it/s]
+----- stdout -----
+train_batch (3.144):  61%|██████    | 422/697 [03:38<02:21,  1.95it/s]
+----- stdout -----
+train_batch (3.144):  61%|██████    | 423/697 [03:38<02:21,  1.93it/s]
+----- stdout -----
+train_batch (3.166):  61%|██████    | 423/697 [03:38<02:21,  1.93it/s]
+----- stdout -----
+train_batch (3.166):  61%|██████    | 424/697 [03:38<02:22,  1.91it/s]
+----- stdout -----
+train_batch (3.203):  61%|██████    | 424/697 [03:39<02:22,  1.91it/s]
+----- stdout -----
+train_batch (3.203):  61%|██████    | 425/697 [03:39<02:22,  1.91it/s]
+----- stdout -----
+train_batch (3.151):  61%|██████    | 425/697 [03:39<02:22,  1.91it/s]
+----- stdout -----
+train_batch (3.151):  61%|██████    | 426/697 [03:39<02:20,  1.92it/s]
+----- stdout -----
+train_batch (3.191):  61%|██████    | 426/697 [03:40<02:20,  1.92it/s]
+----- stdout -----
+train_batch (3.191):  61%|██████▏   | 427/697 [03:40<02:19,  1.93it/s]
+----- stdout -----
+train_batch (3.156):  61%|██████▏   | 427/697 [03:40<02:19,  1.93it/s]
+----- stdout -----
+train_batch (3.156):  61%|██████▏   | 428/697 [03:40<02:18,  1.94it/s]
+----- stdout -----
+train_batch (3.181):  61%|██████▏   | 428/697 [03:41<02:18,  1.94it/s]
+----- stdout -----
+train_batch (3.181):  62%|██████▏   | 429/697 [03:41<02:17,  1.94it/s]
+----- stdout -----
+train_batch (3.196):  62%|██████▏   | 429/697 [03:41<02:17,  1.94it/s]
+----- stdout -----
+train_batch (3.196):  62%|██████▏   | 430/697 [03:41<02:17,  1.95it/s]
+----- stdout -----
+train_batch (3.152):  62%|██████▏   | 430/697 [03:42<02:17,  1.95it/s]
+----- stdout -----
+train_batch (3.152):  62%|██████▏   | 431/697 [03:42<02:16,  1.95it/s]
+----- stdout -----
+train_batch (3.148):  62%|██████▏   | 431/697 [03:42<02:16,  1.95it/s]
+----- stdout -----
+train_batch (3.148):  62%|██████▏   | 432/697 [03:42<02:15,  1.95it/s]
+----- stdout -----
+train_batch (3.175):  62%|██████▏   | 432/697 [03:43<02:15,  1.95it/s]
+----- stdout -----
+train_batch (3.175):  62%|██████▏   | 433/697 [03:43<02:15,  1.95it/s]
+----- stdout -----
+train_batch (3.179):  62%|██████▏   | 433/697 [03:43<02:15,  1.95it/s]
+----- stdout -----
+train_batch (3.179):  62%|██████▏   | 434/697 [03:43<02:15,  1.94it/s]
+----- stdout -----
+train_batch (3.190):  62%|██████▏   | 434/697 [03:44<02:15,  1.94it/s]
+----- stdout -----
+train_batch (3.190):  62%|██████▏   | 435/697 [03:44<02:14,  1.95it/s]
+----- stdout -----
+train_batch (3.171):  62%|██████▏   | 435/697 [03:44<02:14,  1.95it/s]
+----- stdout -----
+train_batch (3.171):  63%|██████▎   | 436/697 [03:44<02:13,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  63%|██████▎   | 436/697 [03:45<02:13,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  63%|██████▎   | 437/697 [03:45<02:13,  1.95it/s]
+----- stdout -----
+train_batch (3.166):  63%|██████▎   | 437/697 [03:45<02:13,  1.95it/s]
+----- stdout -----
+train_batch (3.166):  63%|██████▎   | 438/697 [03:45<02:12,  1.95it/s]
+----- stdout -----
+train_batch (3.168):  63%|██████▎   | 438/697 [03:46<02:12,  1.95it/s]
+----- stdout -----
+train_batch (3.168):  63%|██████▎   | 439/697 [03:46<02:12,  1.95it/s]
+----- stdout -----
+train_batch (3.196):  63%|██████▎   | 439/697 [03:46<02:12,  1.95it/s]
+----- stdout -----
+train_batch (3.196):  63%|██████▎   | 440/697 [03:46<02:12,  1.95it/s]
+----- stdout -----
+train_batch (3.166):  63%|██████▎   | 440/697 [03:47<02:12,  1.95it/s]
+----- stdout -----
+train_batch (3.166):  63%|██████▎   | 441/697 [03:47<02:11,  1.95it/s]
+----- stdout -----
+train_batch (3.161):  63%|██████▎   | 441/697 [03:47<02:11,  1.95it/s]
+----- stdout -----
+train_batch (3.161):  63%|██████▎   | 442/697 [03:47<02:10,  1.96it/s]
+----- stdout -----
+train_batch (3.157):  63%|██████▎   | 442/697 [03:48<02:10,  1.96it/s]
+----- stdout -----
+train_batch (3.157):  64%|██████▎   | 443/697 [03:48<02:09,  1.96it/s]
+----- stdout -----
+train_batch (3.194):  64%|██████▎   | 443/697 [03:48<02:09,  1.96it/s]
+----- stdout -----
+train_batch (3.194):  64%|██████▎   | 444/697 [03:48<02:09,  1.96it/s]
+----- stdout -----
+train_batch (3.165):  64%|██████▎   | 444/697 [03:49<02:09,  1.96it/s]
+----- stdout -----
+train_batch (3.165):  64%|██████▍   | 445/697 [03:49<02:08,  1.96it/s]
+----- stdout -----
+train_batch (3.209):  64%|██████▍   | 445/697 [03:49<02:08,  1.96it/s]
+----- stdout -----
+train_batch (3.209):  64%|██████▍   | 446/697 [03:49<02:08,  1.96it/s]
+----- stdout -----
+train_batch (3.177):  64%|██████▍   | 446/697 [03:50<02:08,  1.96it/s]
+----- stdout -----
+train_batch (3.177):  64%|██████▍   | 447/697 [03:50<02:09,  1.92it/s]
+----- stdout -----
+train_batch (3.108):  64%|██████▍   | 447/697 [03:51<02:09,  1.92it/s]
+----- stdout -----
+train_batch (3.108):  64%|██████▍   | 448/697 [03:51<02:09,  1.92it/s]
+----- stdout -----
+train_batch (3.134):  64%|██████▍   | 448/697 [03:51<02:09,  1.92it/s]
+----- stdout -----
+train_batch (3.134):  64%|██████▍   | 449/697 [03:51<02:08,  1.92it/s]
+----- stdout -----
+train_batch (3.221):  64%|██████▍   | 449/697 [03:52<02:08,  1.92it/s]
+----- stdout -----
+train_batch (3.221):  65%|██████▍   | 450/697 [03:52<02:07,  1.93it/s]
+----- stdout -----
+train_batch (3.208):  65%|██████▍   | 450/697 [03:52<02:07,  1.93it/s]
+----- stdout -----
+train_batch (3.208):  65%|██████▍   | 451/697 [03:52<02:06,  1.94it/s]
+----- stdout -----
+train_batch (3.227):  65%|██████▍   | 451/697 [03:53<02:06,  1.94it/s]
+----- stdout -----
+train_batch (3.227):  65%|██████▍   | 452/697 [03:53<02:06,  1.94it/s]
+----- stdout -----
+train_batch (3.250):  65%|██████▍   | 452/697 [03:53<02:06,  1.94it/s]
+----- stdout -----
+train_batch (3.250):  65%|██████▍   | 453/697 [03:53<02:05,  1.95it/s]
+----- stdout -----
+train_batch (3.180):  65%|██████▍   | 453/697 [03:54<02:05,  1.95it/s]
+----- stdout -----
+train_batch (3.180):  65%|██████▌   | 454/697 [03:54<02:04,  1.96it/s]
+----- stdout -----
+train_batch (3.157):  65%|██████▌   | 454/697 [03:54<02:04,  1.96it/s]
+----- stdout -----
+train_batch (3.157):  65%|██████▌   | 455/697 [03:54<02:03,  1.96it/s]
+----- stdout -----
+train_batch (3.174):  65%|██████▌   | 455/697 [03:55<02:03,  1.96it/s]
+----- stdout -----
+train_batch (3.174):  65%|██████▌   | 456/697 [03:55<02:02,  1.96it/s]
+----- stdout -----
+train_batch (3.157):  65%|██████▌   | 456/697 [03:55<02:02,  1.96it/s]
+----- stdout -----
+train_batch (3.157):  66%|██████▌   | 457/697 [03:55<02:02,  1.96it/s]
+----- stdout -----
+train_batch (3.185):  66%|██████▌   | 457/697 [03:56<02:02,  1.96it/s]
+----- stdout -----
+train_batch (3.185):  66%|██████▌   | 458/697 [03:56<02:01,  1.96it/s]
+----- stdout -----
+train_batch (3.189):  66%|██████▌   | 458/697 [03:56<02:01,  1.96it/s]
+----- stdout -----
+train_batch (3.189):  66%|██████▌   | 459/697 [03:56<02:01,  1.96it/s]
+----- stdout -----
+train_batch (3.194):  66%|██████▌   | 459/697 [03:57<02:01,  1.96it/s]
+----- stdout -----
+train_batch (3.194):  66%|██████▌   | 460/697 [03:57<02:00,  1.96it/s]
+----- stdout -----
+train_batch (3.179):  66%|██████▌   | 460/697 [03:57<02:00,  1.96it/s]
+----- stdout -----
+train_batch (3.179):  66%|██████▌   | 461/697 [03:57<02:00,  1.96it/s]
+----- stdout -----
+train_batch (3.209):  66%|██████▌   | 461/697 [03:58<02:00,  1.96it/s]
+----- stdout -----
+train_batch (3.209):  66%|██████▋   | 462/697 [03:58<02:00,  1.96it/s]
+----- stdout -----
+train_batch (3.147):  66%|██████▋   | 462/697 [03:58<02:00,  1.96it/s]
+----- stdout -----
+train_batch (3.147):  66%|██████▋   | 463/697 [03:58<01:59,  1.96it/s]
+----- stdout -----
+train_batch (3.205):  66%|██████▋   | 463/697 [03:59<01:59,  1.96it/s]
+----- stdout -----
+train_batch (3.205):  67%|██████▋   | 464/697 [03:59<01:59,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  67%|██████▋   | 464/697 [03:59<01:59,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  67%|██████▋   | 465/697 [03:59<01:58,  1.95it/s]
+----- stdout -----
+train_batch (3.206):  67%|██████▋   | 465/697 [04:00<01:58,  1.95it/s]
+----- stdout -----
+train_batch (3.206):  67%|██████▋   | 466/697 [04:00<01:58,  1.95it/s]
+----- stdout -----
+train_batch (3.191):  67%|██████▋   | 466/697 [04:00<01:58,  1.95it/s]
+----- stdout -----
+train_batch (3.191):  67%|██████▋   | 467/697 [04:00<01:58,  1.94it/s]
+----- stdout -----
+train_batch (3.207):  67%|██████▋   | 467/697 [04:01<01:58,  1.94it/s]
+----- stdout -----
+train_batch (3.207):  67%|██████▋   | 468/697 [04:01<01:57,  1.95it/s]
+----- stdout -----
+train_batch (3.163):  67%|██████▋   | 468/697 [04:01<01:57,  1.95it/s]
+----- stdout -----
+train_batch (3.163):  67%|██████▋   | 469/697 [04:01<01:57,  1.95it/s]
+----- stdout -----
+train_batch (3.179):  67%|██████▋   | 469/697 [04:02<01:57,  1.95it/s]
+----- stdout -----
+train_batch (3.179):  67%|██████▋   | 470/697 [04:02<01:58,  1.91it/s]
+----- stdout -----
+train_batch (3.212):  67%|██████▋   | 470/697 [04:02<01:58,  1.91it/s]
+----- stdout -----
+train_batch (3.212):  68%|██████▊   | 471/697 [04:02<01:59,  1.89it/s]
+----- stdout -----
+train_batch (3.205):  68%|██████▊   | 471/697 [04:03<01:59,  1.89it/s]
+----- stdout -----
+train_batch (3.205):  68%|██████▊   | 472/697 [04:03<01:58,  1.90it/s]
+----- stdout -----
+train_batch (3.168):  68%|██████▊   | 472/697 [04:03<01:58,  1.90it/s]
+----- stdout -----
+train_batch (3.168):  68%|██████▊   | 473/697 [04:03<01:56,  1.92it/s]
+----- stdout -----
+train_batch (3.157):  68%|██████▊   | 473/697 [04:04<01:56,  1.92it/s]
+----- stdout -----
+train_batch (3.157):  68%|██████▊   | 474/697 [04:04<01:55,  1.93it/s]
+----- stdout -----
+train_batch (3.221):  68%|██████▊   | 474/697 [04:04<01:55,  1.93it/s]
+----- stdout -----
+train_batch (3.221):  68%|██████▊   | 475/697 [04:04<01:54,  1.94it/s]
+----- stdout -----
+train_batch (3.208):  68%|██████▊   | 475/697 [04:05<01:54,  1.94it/s]
+----- stdout -----
+train_batch (3.208):  68%|██████▊   | 476/697 [04:05<01:53,  1.94it/s]
+----- stdout -----
+train_batch (3.166):  68%|██████▊   | 476/697 [04:06<01:53,  1.94it/s]
+----- stdout -----
+train_batch (3.166):  68%|██████▊   | 477/697 [04:06<01:58,  1.86it/s]
+----- stdout -----
+train_batch (3.157):  68%|██████▊   | 477/697 [04:06<01:58,  1.86it/s]
+----- stdout -----
+train_batch (3.157):  69%|██████▊   | 478/697 [04:06<01:55,  1.89it/s]
+----- stdout -----
+train_batch (3.178):  69%|██████▊   | 478/697 [04:07<01:55,  1.89it/s]
+----- stdout -----
+train_batch (3.178):  69%|██████▊   | 479/697 [04:07<01:54,  1.91it/s]
+----- stdout -----
+train_batch (3.191):  69%|██████▊   | 479/697 [04:07<01:54,  1.91it/s]
+----- stdout -----
+train_batch (3.191):  69%|██████▉   | 480/697 [04:07<01:52,  1.93it/s]
+----- stdout -----
+train_batch (3.192):  69%|██████▉   | 480/697 [04:08<01:52,  1.93it/s]
+----- stdout -----
+train_batch (3.192):  69%|██████▉   | 481/697 [04:08<01:51,  1.93it/s]
+----- stdout -----
+train_batch (3.202):  69%|██████▉   | 481/697 [04:08<01:51,  1.93it/s]
+----- stdout -----
+train_batch (3.202):  69%|██████▉   | 482/697 [04:08<01:50,  1.94it/s]
+----- stdout -----
+train_batch (3.225):  69%|██████▉   | 482/697 [04:09<01:50,  1.94it/s]
+----- stdout -----
+train_batch (3.225):  69%|██████▉   | 483/697 [04:09<01:49,  1.95it/s]
+----- stdout -----
+train_batch (3.192):  69%|██████▉   | 483/697 [04:09<01:49,  1.95it/s]
+----- stdout -----
+train_batch (3.192):  69%|██████▉   | 484/697 [04:09<01:49,  1.95it/s]
+----- stdout -----
+train_batch (3.203):  69%|██████▉   | 484/697 [04:10<01:49,  1.95it/s]
+----- stdout -----
+train_batch (3.203):  70%|██████▉   | 485/697 [04:10<01:48,  1.95it/s]
+----- stdout -----
+train_batch (3.178):  70%|██████▉   | 485/697 [04:10<01:48,  1.95it/s]
+----- stdout -----
+train_batch (3.178):  70%|██████▉   | 486/697 [04:10<01:48,  1.95it/s]
+----- stdout -----
+train_batch (3.193):  70%|██████▉   | 486/697 [04:11<01:48,  1.95it/s]
+----- stdout -----
+train_batch (3.193):  70%|██████▉   | 487/697 [04:11<01:47,  1.95it/s]
+----- stdout -----
+train_batch (3.177):  70%|██████▉   | 487/697 [04:11<01:47,  1.95it/s]
+----- stdout -----
+train_batch (3.177):  70%|███████   | 488/697 [04:11<01:46,  1.95it/s]
+----- stdout -----
+train_batch (3.181):  70%|███████   | 488/697 [04:12<01:46,  1.95it/s]
+----- stdout -----
+train_batch (3.181):  70%|███████   | 489/697 [04:12<01:46,  1.95it/s]
+----- stdout -----
+train_batch (3.217):  70%|███████   | 489/697 [04:12<01:46,  1.95it/s]
+----- stdout -----
+train_batch (3.217):  70%|███████   | 490/697 [04:12<01:45,  1.95it/s]
+----- stdout -----
+train_batch (3.137):  70%|███████   | 490/697 [04:13<01:45,  1.95it/s]
+----- stdout -----
+train_batch (3.137):  70%|███████   | 491/697 [04:13<01:45,  1.95it/s]
+----- stdout -----
+train_batch (3.109):  70%|███████   | 491/697 [04:13<01:45,  1.95it/s]
+----- stdout -----
+train_batch (3.109):  71%|███████   | 492/697 [04:13<01:45,  1.95it/s]
+----- stdout -----
+train_batch (3.184):  71%|███████   | 492/697 [04:14<01:45,  1.95it/s]
+----- stdout -----
+train_batch (3.184):  71%|███████   | 493/697 [04:14<01:45,  1.93it/s]
+----- stdout -----
+train_batch (3.171):  71%|███████   | 493/697 [04:14<01:45,  1.93it/s]
+----- stdout -----
+train_batch (3.171):  71%|███████   | 494/697 [04:14<01:45,  1.92it/s]
+----- stdout -----
+train_batch (3.191):  71%|███████   | 494/697 [04:15<01:45,  1.92it/s]
+----- stdout -----
+train_batch (3.191):  71%|███████   | 495/697 [04:15<01:44,  1.93it/s]
+----- stdout -----
+train_batch (3.157):  71%|███████   | 495/697 [04:15<01:44,  1.93it/s]
+----- stdout -----
+train_batch (3.157):  71%|███████   | 496/697 [04:15<01:43,  1.94it/s]
+----- stdout -----
+train_batch (3.196):  71%|███████   | 496/697 [04:16<01:43,  1.94it/s]
+----- stdout -----
+train_batch (3.196):  71%|███████▏  | 497/697 [04:16<01:42,  1.94it/s]
+----- stdout -----
+train_batch (3.196):  71%|███████▏  | 497/697 [04:16<01:42,  1.94it/s]
+----- stdout -----
+train_batch (3.196):  71%|███████▏  | 498/697 [04:16<01:41,  1.95it/s]
+----- stdout -----
+train_batch (3.225):  71%|███████▏  | 498/697 [04:17<01:41,  1.95it/s]
+----- stdout -----
+train_batch (3.225):  72%|███████▏  | 499/697 [04:17<01:41,  1.96it/s]
+----- stdout -----
+train_batch (3.170):  72%|███████▏  | 499/697 [04:17<01:41,  1.96it/s]
+----- stdout -----
+train_batch (3.170):  72%|███████▏  | 500/697 [04:17<01:40,  1.96it/s]
+----- stdout -----
+train_batch (3.228):  72%|███████▏  | 500/697 [04:18<01:40,  1.96it/s]
+----- stdout -----
+train_batch (3.228):  72%|███████▏  | 501/697 [04:18<01:39,  1.96it/s]
+----- stdout -----
+train_batch (3.171):  72%|███████▏  | 501/697 [04:18<01:39,  1.96it/s]
+----- stdout -----
+train_batch (3.171):  72%|███████▏  | 502/697 [04:18<01:39,  1.96it/s]
+----- stdout -----
+train_batch (3.197):  72%|███████▏  | 502/697 [04:19<01:39,  1.96it/s]
+----- stdout -----
+train_batch (3.197):  72%|███████▏  | 503/697 [04:19<01:38,  1.96it/s]
+----- stdout -----
+train_batch (3.208):  72%|███████▏  | 503/697 [04:19<01:38,  1.96it/s]
+----- stdout -----
+train_batch (3.208):  72%|███████▏  | 504/697 [04:19<01:38,  1.96it/s]
+----- stdout -----
+train_batch (3.198):  72%|███████▏  | 504/697 [04:20<01:38,  1.96it/s]
+----- stdout -----
+train_batch (3.198):  72%|███████▏  | 505/697 [04:20<01:37,  1.96it/s]
+----- stdout -----
+train_batch (3.219):  72%|███████▏  | 505/697 [04:20<01:37,  1.96it/s]
+----- stdout -----
+train_batch (3.219):  73%|███████▎  | 506/697 [04:20<01:37,  1.96it/s]
+----- stdout -----
+train_batch (3.135):  73%|███████▎  | 506/697 [04:21<01:37,  1.96it/s]
+----- stdout -----
+train_batch (3.135):  73%|███████▎  | 507/697 [04:21<01:36,  1.96it/s]
+----- stdout -----
+train_batch (3.182):  73%|███████▎  | 507/697 [04:21<01:36,  1.96it/s]
+----- stdout -----
+train_batch (3.182):  73%|███████▎  | 508/697 [04:21<01:36,  1.96it/s]
+----- stdout -----
+train_batch (3.168):  73%|███████▎  | 508/697 [04:22<01:36,  1.96it/s]
+----- stdout -----
+train_batch (3.168):  73%|███████▎  | 509/697 [04:22<01:36,  1.96it/s]
+----- stdout -----
+train_batch (3.164):  73%|███████▎  | 509/697 [04:22<01:36,  1.96it/s]
+----- stdout -----
+train_batch (3.164):  73%|███████▎  | 510/697 [04:22<01:35,  1.96it/s]
+----- stdout -----
+train_batch (3.162):  73%|███████▎  | 510/697 [04:23<01:35,  1.96it/s]
+----- stdout -----
+train_batch (3.162):  73%|███████▎  | 511/697 [04:23<01:34,  1.96it/s]
+----- stdout -----
+train_batch (3.159):  73%|███████▎  | 511/697 [04:23<01:34,  1.96it/s]
+----- stdout -----
+train_batch (3.159):  73%|███████▎  | 512/697 [04:23<01:34,  1.97it/s]
+----- stdout -----
+train_batch (3.201):  73%|███████▎  | 512/697 [04:24<01:34,  1.97it/s]
+----- stdout -----
+train_batch (3.201):  74%|███████▎  | 513/697 [04:24<01:33,  1.97it/s]
+----- stdout -----
+train_batch (3.194):  74%|███████▎  | 513/697 [04:24<01:33,  1.97it/s]
+----- stdout -----
+train_batch (3.194):  74%|███████▎  | 514/697 [04:24<01:32,  1.97it/s]
+----- stdout -----
+train_batch (3.139):  74%|███████▎  | 514/697 [04:25<01:32,  1.97it/s]
+----- stdout -----
+train_batch (3.139):  74%|███████▍  | 515/697 [04:25<01:32,  1.97it/s]
+----- stdout -----
+train_batch (3.167):  74%|███████▍  | 515/697 [04:25<01:32,  1.97it/s]
+----- stdout -----
+train_batch (3.167):  74%|███████▍  | 516/697 [04:25<01:32,  1.95it/s]
+----- stdout -----
+train_batch (3.136):  74%|███████▍  | 516/697 [04:26<01:32,  1.95it/s]
+----- stdout -----
+train_batch (3.136):  74%|███████▍  | 517/697 [04:26<01:32,  1.95it/s]
+----- stdout -----
+train_batch (3.184):  74%|███████▍  | 517/697 [04:27<01:32,  1.95it/s]
+----- stdout -----
+train_batch (3.184):  74%|███████▍  | 518/697 [04:27<01:31,  1.95it/s]
+----- stdout -----
+train_batch (3.201):  74%|███████▍  | 518/697 [04:27<01:31,  1.95it/s]
+----- stdout -----
+train_batch (3.201):  74%|███████▍  | 519/697 [04:27<01:31,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  74%|███████▍  | 519/697 [04:28<01:31,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  75%|███████▍  | 520/697 [04:28<01:30,  1.96it/s]
+----- stdout -----
+train_batch (3.174):  75%|███████▍  | 520/697 [04:28<01:30,  1.96it/s]
+----- stdout -----
+train_batch (3.174):  75%|███████▍  | 521/697 [04:28<01:29,  1.97it/s]
+----- stdout -----
+train_batch (3.154):  75%|███████▍  | 521/697 [04:29<01:29,  1.97it/s]
+----- stdout -----
+train_batch (3.154):  75%|███████▍  | 522/697 [04:29<01:28,  1.97it/s]
+----- stdout -----
+train_batch (3.207):  75%|███████▍  | 522/697 [04:29<01:28,  1.97it/s]
+----- stdout -----
+train_batch (3.207):  75%|███████▌  | 523/697 [04:29<01:28,  1.97it/s]
+----- stdout -----
+train_batch (3.197):  75%|███████▌  | 523/697 [04:30<01:28,  1.97it/s]
+----- stdout -----
+train_batch (3.197):  75%|███████▌  | 524/697 [04:30<01:27,  1.97it/s]
+----- stdout -----
+train_batch (3.190):  75%|███████▌  | 524/697 [04:30<01:27,  1.97it/s]
+----- stdout -----
+train_batch (3.190):  75%|███████▌  | 525/697 [04:30<01:27,  1.97it/s]
+----- stdout -----
+train_batch (3.173):  75%|███████▌  | 525/697 [04:31<01:27,  1.97it/s]
+----- stdout -----
+train_batch (3.173):  75%|███████▌  | 526/697 [04:31<01:26,  1.97it/s]
+----- stdout -----
+train_batch (3.196):  75%|███████▌  | 526/697 [04:31<01:26,  1.97it/s]
+----- stdout -----
+train_batch (3.196):  76%|███████▌  | 527/697 [04:31<01:26,  1.97it/s]
+----- stdout -----
+train_batch (3.205):  76%|███████▌  | 527/697 [04:32<01:26,  1.97it/s]
+----- stdout -----
+train_batch (3.205):  76%|███████▌  | 528/697 [04:32<01:26,  1.96it/s]
+----- stdout -----
+train_batch (3.152):  76%|███████▌  | 528/697 [04:32<01:26,  1.96it/s]
+----- stdout -----
+train_batch (3.152):  76%|███████▌  | 529/697 [04:32<01:25,  1.96it/s]
+----- stdout -----
+train_batch (3.164):  76%|███████▌  | 529/697 [04:33<01:25,  1.96it/s]
+----- stdout -----
+train_batch (3.164):  76%|███████▌  | 530/697 [04:33<01:25,  1.96it/s]
+----- stdout -----
+train_batch (3.203):  76%|███████▌  | 530/697 [04:33<01:25,  1.96it/s]
+----- stdout -----
+train_batch (3.203):  76%|███████▌  | 531/697 [04:33<01:24,  1.95it/s]
+----- stdout -----
+train_batch (3.201):  76%|███████▌  | 531/697 [04:34<01:24,  1.95it/s]
+----- stdout -----
+train_batch (3.201):  76%|███████▋  | 532/697 [04:34<01:24,  1.95it/s]
+----- stdout -----
+train_batch (3.130):  76%|███████▋  | 532/697 [04:34<01:24,  1.95it/s]
+----- stdout -----
+train_batch (3.130):  76%|███████▋  | 533/697 [04:34<01:23,  1.95it/s]
+----- stdout -----
+train_batch (3.238):  76%|███████▋  | 533/697 [04:35<01:23,  1.95it/s]
+----- stdout -----
+train_batch (3.238):  77%|███████▋  | 534/697 [04:35<01:26,  1.89it/s]
+----- stdout -----
+train_batch (3.197):  77%|███████▋  | 534/697 [04:35<01:26,  1.89it/s]
+----- stdout -----
+train_batch (3.197):  77%|███████▋  | 535/697 [04:35<01:24,  1.91it/s]
+----- stdout -----
+train_batch (3.179):  77%|███████▋  | 535/697 [04:36<01:24,  1.91it/s]
+----- stdout -----
+train_batch (3.179):  77%|███████▋  | 536/697 [04:36<01:23,  1.92it/s]
+----- stdout -----
+train_batch (3.192):  77%|███████▋  | 536/697 [04:36<01:23,  1.92it/s]
+----- stdout -----
+train_batch (3.192):  77%|███████▋  | 537/697 [04:36<01:22,  1.93it/s]
+----- stdout -----
+train_batch (3.206):  77%|███████▋  | 537/697 [04:37<01:22,  1.93it/s]
+----- stdout -----
+train_batch (3.206):  77%|███████▋  | 538/697 [04:37<01:22,  1.94it/s]
+----- stdout -----
+train_batch (3.161):  77%|███████▋  | 538/697 [04:37<01:22,  1.94it/s]
+----- stdout -----
+train_batch (3.161):  77%|███████▋  | 539/697 [04:37<01:21,  1.93it/s]
+----- stdout -----
+train_batch (3.189):  77%|███████▋  | 539/697 [04:38<01:21,  1.93it/s]
+----- stdout -----
+train_batch (3.189):  77%|███████▋  | 540/697 [04:38<01:22,  1.90it/s]
+----- stdout -----
+train_batch (3.152):  77%|███████▋  | 540/697 [04:38<01:22,  1.90it/s]
+----- stdout -----
+train_batch (3.152):  78%|███████▊  | 541/697 [04:38<01:21,  1.91it/s]
+----- stdout -----
+train_batch (3.170):  78%|███████▊  | 541/697 [04:39<01:21,  1.91it/s]
+----- stdout -----
+train_batch (3.170):  78%|███████▊  | 542/697 [04:39<01:20,  1.92it/s]
+----- stdout -----
+train_batch (3.184):  78%|███████▊  | 542/697 [04:39<01:20,  1.92it/s]
+----- stdout -----
+train_batch (3.184):  78%|███████▊  | 543/697 [04:39<01:19,  1.93it/s]
+----- stdout -----
+train_batch (3.238):  78%|███████▊  | 543/697 [04:40<01:19,  1.93it/s]
+----- stdout -----
+train_batch (3.238):  78%|███████▊  | 544/697 [04:40<01:18,  1.94it/s]
+----- stdout -----
+train_batch (3.187):  78%|███████▊  | 544/697 [04:40<01:18,  1.94it/s]
+----- stdout -----
+train_batch (3.187):  78%|███████▊  | 545/697 [04:40<01:18,  1.94it/s]
+----- stdout -----
+train_batch (3.198):  78%|███████▊  | 545/697 [04:41<01:18,  1.94it/s]
+----- stdout -----
+train_batch (3.198):  78%|███████▊  | 546/697 [04:41<01:17,  1.95it/s]
+----- stdout -----
+train_batch (3.175):  78%|███████▊  | 546/697 [04:41<01:17,  1.95it/s]
+----- stdout -----
+train_batch (3.175):  78%|███████▊  | 547/697 [04:41<01:16,  1.95it/s]
+----- stdout -----
+train_batch (3.174):  78%|███████▊  | 547/697 [04:42<01:16,  1.95it/s]
+----- stdout -----
+train_batch (3.174):  79%|███████▊  | 548/697 [04:42<01:16,  1.95it/s]
+----- stdout -----
+train_batch (3.177):  79%|███████▊  | 548/697 [04:42<01:16,  1.95it/s]
+----- stdout -----
+train_batch (3.177):  79%|███████▉  | 549/697 [04:42<01:15,  1.95it/s]
+----- stdout -----
+train_batch (3.206):  79%|███████▉  | 549/697 [04:43<01:15,  1.95it/s]
+----- stdout -----
+train_batch (3.206):  79%|███████▉  | 550/697 [04:43<01:15,  1.95it/s]
+----- stdout -----
+train_batch (3.183):  79%|███████▉  | 550/697 [04:43<01:15,  1.95it/s]
+----- stdout -----
+train_batch (3.183):  79%|███████▉  | 551/697 [04:43<01:14,  1.95it/s]
+----- stdout -----
+train_batch (3.170):  79%|███████▉  | 551/697 [04:44<01:14,  1.95it/s]
+----- stdout -----
+train_batch (3.170):  79%|███████▉  | 552/697 [04:44<01:14,  1.95it/s]
+----- stdout -----
+train_batch (3.162):  79%|███████▉  | 552/697 [04:44<01:14,  1.95it/s]
+----- stdout -----
+train_batch (3.162):  79%|███████▉  | 553/697 [04:44<01:13,  1.95it/s]
+----- stdout -----
+train_batch (3.193):  79%|███████▉  | 553/697 [04:45<01:13,  1.95it/s]
+----- stdout -----
+train_batch (3.193):  79%|███████▉  | 554/697 [04:45<01:13,  1.95it/s]
+----- stdout -----
+train_batch (3.186):  79%|███████▉  | 554/697 [04:46<01:13,  1.95it/s]
+----- stdout -----
+train_batch (3.186):  80%|███████▉  | 555/697 [04:46<01:12,  1.95it/s]
+----- stdout -----
+train_batch (3.170):  80%|███████▉  | 555/697 [04:46<01:12,  1.95it/s]
+----- stdout -----
+train_batch (3.170):  80%|███████▉  | 556/697 [04:46<01:12,  1.95it/s]
+----- stdout -----
+train_batch (3.191):  80%|███████▉  | 556/697 [04:47<01:12,  1.95it/s]
+----- stdout -----
+train_batch (3.191):  80%|███████▉  | 557/697 [04:47<01:11,  1.96it/s]
+----- stdout -----
+train_batch (3.171):  80%|███████▉  | 557/697 [04:47<01:11,  1.96it/s]
+----- stdout -----
+train_batch (3.171):  80%|████████  | 558/697 [04:47<01:10,  1.96it/s]
+----- stdout -----
+train_batch (3.153):  80%|████████  | 558/697 [04:48<01:10,  1.96it/s]
+----- stdout -----
+train_batch (3.153):  80%|████████  | 559/697 [04:48<01:10,  1.95it/s]
+----- stdout -----
+train_batch (3.163):  80%|████████  | 559/697 [04:48<01:10,  1.95it/s]
+----- stdout -----
+train_batch (3.163):  80%|████████  | 560/697 [04:48<01:10,  1.96it/s]
+----- stdout -----
+train_batch (3.216):  80%|████████  | 560/697 [04:49<01:10,  1.96it/s]
+----- stdout -----
+train_batch (3.216):  80%|████████  | 561/697 [04:49<01:09,  1.95it/s]
+----- stdout -----
+train_batch (3.195):  80%|████████  | 561/697 [04:49<01:09,  1.95it/s]
+----- stdout -----
+train_batch (3.195):  81%|████████  | 562/697 [04:49<01:09,  1.94it/s]
+----- stdout -----
+train_batch (3.185):  81%|████████  | 562/697 [04:50<01:09,  1.94it/s]
+----- stdout -----
+train_batch (3.185):  81%|████████  | 563/697 [04:50<01:09,  1.93it/s]
+----- stdout -----
+train_batch (3.187):  81%|████████  | 563/697 [04:50<01:09,  1.93it/s]
+----- stdout -----
+train_batch (3.187):  81%|████████  | 564/697 [04:50<01:08,  1.93it/s]
+----- stdout -----
+train_batch (3.213):  81%|████████  | 564/697 [04:51<01:08,  1.93it/s]
+----- stdout -----
+train_batch (3.213):  81%|████████  | 565/697 [04:51<01:08,  1.94it/s]
+----- stdout -----
+train_batch (3.134):  81%|████████  | 565/697 [04:51<01:08,  1.94it/s]
+----- stdout -----
+train_batch (3.134):  81%|████████  | 566/697 [04:51<01:07,  1.94it/s]
+----- stdout -----
+train_batch (3.167):  81%|████████  | 566/697 [04:52<01:07,  1.94it/s]
+----- stdout -----
+train_batch (3.167):  81%|████████▏ | 567/697 [04:52<01:06,  1.94it/s]
+----- stdout -----
+train_batch (3.169):  81%|████████▏ | 567/697 [04:52<01:06,  1.94it/s]
+----- stdout -----
+train_batch (3.169):  81%|████████▏ | 568/697 [04:52<01:06,  1.95it/s]
+----- stdout -----
+train_batch (3.173):  81%|████████▏ | 568/697 [04:53<01:06,  1.95it/s]
+----- stdout -----
+train_batch (3.173):  82%|████████▏ | 569/697 [04:53<01:05,  1.95it/s]
+----- stdout -----
+train_batch (3.131):  82%|████████▏ | 569/697 [04:53<01:05,  1.95it/s]
+----- stdout -----
+train_batch (3.131):  82%|████████▏ | 570/697 [04:53<01:05,  1.95it/s]
+----- stdout -----
+train_batch (3.172):  82%|████████▏ | 570/697 [04:54<01:05,  1.95it/s]
+----- stdout -----
+train_batch (3.172):  82%|████████▏ | 571/697 [04:54<01:04,  1.95it/s]
+----- stdout -----
+train_batch (3.185):  82%|████████▏ | 571/697 [04:54<01:04,  1.95it/s]
+----- stdout -----
+train_batch (3.185):  82%|████████▏ | 572/697 [04:54<01:03,  1.95it/s]
+----- stdout -----
+train_batch (3.238):  82%|████████▏ | 572/697 [04:55<01:03,  1.95it/s]
+----- stdout -----
+train_batch (3.238):  82%|████████▏ | 573/697 [04:55<01:03,  1.96it/s]
+----- stdout -----
+train_batch (3.207):  82%|████████▏ | 573/697 [04:55<01:03,  1.96it/s]
+----- stdout -----
+train_batch (3.207):  82%|████████▏ | 574/697 [04:55<01:02,  1.96it/s]
+----- stdout -----
+train_batch (3.194):  82%|████████▏ | 574/697 [04:56<01:02,  1.96it/s]
+----- stdout -----
+train_batch (3.194):  82%|████████▏ | 575/697 [04:56<01:02,  1.96it/s]
+----- stdout -----
+train_batch (3.234):  82%|████████▏ | 575/697 [04:56<01:02,  1.96it/s]
+----- stdout -----
+train_batch (3.234):  83%|████████▎ | 576/697 [04:56<01:01,  1.95it/s]
+----- stdout -----
+train_batch (3.231):  83%|████████▎ | 576/697 [04:57<01:01,  1.95it/s]
+----- stdout -----
+train_batch (3.231):  83%|████████▎ | 577/697 [04:57<01:01,  1.96it/s]
+----- stdout -----
+train_batch (3.222):  83%|████████▎ | 577/697 [04:57<01:01,  1.96it/s]
+----- stdout -----
+train_batch (3.222):  83%|████████▎ | 578/697 [04:57<01:00,  1.95it/s]
+----- stdout -----
+train_batch (3.197):  83%|████████▎ | 578/697 [04:58<01:00,  1.95it/s]
+----- stdout -----
+train_batch (3.197):  83%|████████▎ | 579/697 [04:58<01:00,  1.96it/s]
+----- stdout -----
+train_batch (3.193):  83%|████████▎ | 579/697 [04:58<01:00,  1.96it/s]
+----- stdout -----
+train_batch (3.193):  83%|████████▎ | 580/697 [04:58<00:59,  1.96it/s]
+----- stdout -----
+train_batch (3.197):  83%|████████▎ | 580/697 [04:59<00:59,  1.96it/s]
+----- stdout -----
+train_batch (3.197):  83%|████████▎ | 581/697 [04:59<00:59,  1.96it/s]
+----- stdout -----
+train_batch (3.171):  83%|████████▎ | 581/697 [04:59<00:59,  1.96it/s]
+----- stdout -----
+train_batch (3.171):  84%|████████▎ | 582/697 [04:59<00:58,  1.95it/s]
+----- stdout -----
+train_batch (3.210):  84%|████████▎ | 582/697 [05:00<00:58,  1.95it/s]
+----- stdout -----
+train_batch (3.210):  84%|████████▎ | 583/697 [05:00<00:58,  1.95it/s]
+----- stdout -----
+train_batch (3.155):  84%|████████▎ | 583/697 [05:00<00:58,  1.95it/s]
+----- stdout -----
+train_batch (3.155):  84%|████████▍ | 584/697 [05:00<00:57,  1.95it/s]
+----- stdout -----
+train_batch (3.168):  84%|████████▍ | 584/697 [05:01<00:57,  1.95it/s]
+----- stdout -----
+train_batch (3.168):  84%|████████▍ | 585/697 [05:01<00:57,  1.94it/s]
+----- stdout -----
+train_batch (3.168):  84%|████████▍ | 585/697 [05:01<00:57,  1.94it/s]
+----- stdout -----
+train_batch (3.168):  84%|████████▍ | 586/697 [05:01<00:57,  1.92it/s]
+----- stdout -----
+train_batch (3.191):  84%|████████▍ | 586/697 [05:02<00:57,  1.92it/s]
+----- stdout -----
+train_batch (3.191):  84%|████████▍ | 587/697 [05:02<00:57,  1.92it/s]
+----- stdout -----
+train_batch (3.145):  84%|████████▍ | 587/697 [05:02<00:57,  1.92it/s]
+----- stdout -----
+train_batch (3.145):  84%|████████▍ | 588/697 [05:02<00:56,  1.92it/s]
+----- stdout -----
+train_batch (3.166):  84%|████████▍ | 588/697 [05:03<00:56,  1.92it/s]
+----- stdout -----
+train_batch (3.166):  85%|████████▍ | 589/697 [05:03<00:55,  1.93it/s]
+----- stdout -----
+train_batch (3.169):  85%|████████▍ | 589/697 [05:04<00:55,  1.93it/s]
+----- stdout -----
+train_batch (3.169):  85%|████████▍ | 590/697 [05:04<00:55,  1.94it/s]
+----- stdout -----
+train_batch (3.222):  85%|████████▍ | 590/697 [05:04<00:55,  1.94it/s]
+----- stdout -----
+train_batch (3.222):  85%|████████▍ | 591/697 [05:04<00:54,  1.94it/s]
+----- stdout -----
+train_batch (3.166):  85%|████████▍ | 591/697 [05:05<00:54,  1.94it/s]
+----- stdout -----
+train_batch (3.166):  85%|████████▍ | 592/697 [05:05<00:53,  1.95it/s]
+----- stdout -----
+train_batch (3.172):  85%|████████▍ | 592/697 [05:05<00:53,  1.95it/s]
+----- stdout -----
+train_batch (3.172):  85%|████████▌ | 593/697 [05:05<00:53,  1.95it/s]
+----- stdout -----
+train_batch (3.197):  85%|████████▌ | 593/697 [05:06<00:53,  1.95it/s]
+----- stdout -----
+train_batch (3.197):  85%|████████▌ | 594/697 [05:06<00:52,  1.95it/s]
+----- stdout -----
+train_batch (3.206):  85%|████████▌ | 594/697 [05:06<00:52,  1.95it/s]
+----- stdout -----
+train_batch (3.206):  85%|████████▌ | 595/697 [05:06<00:54,  1.89it/s]
+----- stdout -----
+train_batch (3.198):  85%|████████▌ | 595/697 [05:07<00:54,  1.89it/s]
+----- stdout -----
+train_batch (3.198):  86%|████████▌ | 596/697 [05:07<00:52,  1.91it/s]
+----- stdout -----
+train_batch (3.198):  86%|████████▌ | 596/697 [05:07<00:52,  1.91it/s]
+----- stdout -----
+train_batch (3.198):  86%|████████▌ | 597/697 [05:07<00:51,  1.92it/s]
+----- stdout -----
+train_batch (3.125):  86%|████████▌ | 597/697 [05:08<00:51,  1.92it/s]
+----- stdout -----
+train_batch (3.125):  86%|████████▌ | 598/697 [05:08<00:51,  1.93it/s]
+----- stdout -----
+train_batch (3.185):  86%|████████▌ | 598/697 [05:08<00:51,  1.93it/s]
+----- stdout -----
+train_batch (3.185):  86%|████████▌ | 599/697 [05:08<00:50,  1.93it/s]
+----- stdout -----
+train_batch (3.141):  86%|████████▌ | 599/697 [05:09<00:50,  1.93it/s]
+----- stdout -----
+train_batch (3.141):  86%|████████▌ | 600/697 [05:09<00:50,  1.94it/s]
+----- stdout -----
+train_batch (3.150):  86%|████████▌ | 600/697 [05:09<00:50,  1.94it/s]
+----- stdout -----
+train_batch (3.150):  86%|████████▌ | 601/697 [05:09<00:49,  1.94it/s]
+----- stdout -----
+train_batch (3.158):  86%|████████▌ | 601/697 [05:10<00:49,  1.94it/s]
+----- stdout -----
+train_batch (3.158):  86%|████████▋ | 602/697 [05:10<00:48,  1.94it/s]
+----- stdout -----
+train_batch (3.198):  86%|████████▋ | 602/697 [05:10<00:48,  1.94it/s]
+----- stdout -----
+train_batch (3.198):  87%|████████▋ | 603/697 [05:10<00:48,  1.95it/s]
+----- stdout -----
+train_batch (3.166):  87%|████████▋ | 603/697 [05:11<00:48,  1.95it/s]
+----- stdout -----
+train_batch (3.166):  87%|████████▋ | 604/697 [05:11<00:47,  1.95it/s]
+----- stdout -----
+train_batch (3.126):  87%|████████▋ | 604/697 [05:11<00:47,  1.95it/s]
+----- stdout -----
+train_batch (3.126):  87%|████████▋ | 605/697 [05:11<00:47,  1.95it/s]
+----- stdout -----
+train_batch (3.146):  87%|████████▋ | 605/697 [05:12<00:47,  1.95it/s]
+----- stdout -----
+train_batch (3.146):  87%|████████▋ | 606/697 [05:12<00:46,  1.95it/s]
+----- stdout -----
+train_batch (3.190):  87%|████████▋ | 606/697 [05:12<00:46,  1.95it/s]
+----- stdout -----
+train_batch (3.190):  87%|████████▋ | 607/697 [05:12<00:46,  1.94it/s]
+----- stdout -----
+train_batch (3.184):  87%|████████▋ | 607/697 [05:13<00:46,  1.94it/s]
+----- stdout -----
+train_batch (3.184):  87%|████████▋ | 608/697 [05:13<00:46,  1.93it/s]
+----- stdout -----
+train_batch (3.166):  87%|████████▋ | 608/697 [05:13<00:46,  1.93it/s]
+----- stdout -----
+train_batch (3.166):  87%|████████▋ | 609/697 [05:13<00:45,  1.92it/s]
+----- stdout -----
+train_batch (3.180):  87%|████████▋ | 609/697 [05:14<00:45,  1.92it/s]
+----- stdout -----
+train_batch (3.180):  88%|████████▊ | 610/697 [05:14<00:45,  1.93it/s]
+----- stdout -----
+train_batch (3.197):  88%|████████▊ | 610/697 [05:14<00:45,  1.93it/s]
+----- stdout -----
+train_batch (3.197):  88%|████████▊ | 611/697 [05:14<00:44,  1.94it/s]
+----- stdout -----
+train_batch (3.183):  88%|████████▊ | 611/697 [05:15<00:44,  1.94it/s]
+----- stdout -----
+train_batch (3.183):  88%|████████▊ | 612/697 [05:15<00:43,  1.94it/s]
+----- stdout -----
+train_batch (3.117):  88%|████████▊ | 612/697 [05:15<00:43,  1.94it/s]
+----- stdout -----
+train_batch (3.117):  88%|████████▊ | 613/697 [05:15<00:43,  1.94it/s]
+----- stdout -----
+train_batch (3.164):  88%|████████▊ | 613/697 [05:16<00:43,  1.94it/s]
+----- stdout -----
+train_batch (3.164):  88%|████████▊ | 614/697 [05:16<00:42,  1.95it/s]
+----- stdout -----
+train_batch (3.181):  88%|████████▊ | 614/697 [05:16<00:42,  1.95it/s]
+----- stdout -----
+train_batch (3.181):  88%|████████▊ | 615/697 [05:16<00:42,  1.95it/s]
+----- stdout -----
+train_batch (3.196):  88%|████████▊ | 615/697 [05:17<00:42,  1.95it/s]
+----- stdout -----
+train_batch (3.196):  88%|████████▊ | 616/697 [05:17<00:41,  1.95it/s]
+----- stdout -----
+train_batch (3.165):  88%|████████▊ | 616/697 [05:17<00:41,  1.95it/s]
+----- stdout -----
+train_batch (3.165):  89%|████████▊ | 617/697 [05:17<00:40,  1.96it/s]
+----- stdout -----
+train_batch (3.140):  89%|████████▊ | 617/697 [05:18<00:40,  1.96it/s]
+----- stdout -----
+train_batch (3.140):  89%|████████▊ | 618/697 [05:18<00:40,  1.96it/s]
+----- stdout -----
+train_batch (3.156):  89%|████████▊ | 618/697 [05:18<00:40,  1.96it/s]
+----- stdout -----
+train_batch (3.156):  89%|████████▉ | 619/697 [05:18<00:39,  1.95it/s]
+----- stdout -----
+train_batch (3.128):  89%|████████▉ | 619/697 [05:19<00:39,  1.95it/s]
+----- stdout -----
+train_batch (3.128):  89%|████████▉ | 620/697 [05:19<00:39,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  89%|████████▉ | 620/697 [05:19<00:39,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  89%|████████▉ | 621/697 [05:19<00:38,  1.95it/s]
+----- stdout -----
+train_batch (3.227):  89%|████████▉ | 621/697 [05:20<00:38,  1.95it/s]
+----- stdout -----
+train_batch (3.227):  89%|████████▉ | 622/697 [05:20<00:38,  1.95it/s]
+----- stdout -----
+train_batch (3.145):  89%|████████▉ | 622/697 [05:21<00:38,  1.95it/s]
+----- stdout -----
+train_batch (3.145):  89%|████████▉ | 623/697 [05:21<00:37,  1.95it/s]
+----- stdout -----
+train_batch (3.189):  89%|████████▉ | 623/697 [05:21<00:37,  1.95it/s]
+----- stdout -----
+train_batch (3.189):  90%|████████▉ | 624/697 [05:21<00:37,  1.95it/s]
+----- stdout -----
+train_batch (3.185):  90%|████████▉ | 624/697 [05:22<00:37,  1.95it/s]
+----- stdout -----
+train_batch (3.185):  90%|████████▉ | 625/697 [05:22<00:37,  1.94it/s]
+----- stdout -----
+train_batch (3.164):  90%|████████▉ | 625/697 [05:22<00:37,  1.94it/s]
+----- stdout -----
+train_batch (3.164):  90%|████████▉ | 626/697 [05:22<00:36,  1.94it/s]
+----- stdout -----
+train_batch (3.222):  90%|████████▉ | 626/697 [05:23<00:36,  1.94it/s]
+----- stdout -----
+train_batch (3.222):  90%|████████▉ | 627/697 [05:23<00:35,  1.95it/s]
+----- stdout -----
+train_batch (3.193):  90%|████████▉ | 627/697 [05:23<00:35,  1.95it/s]
+----- stdout -----
+train_batch (3.193):  90%|█████████ | 628/697 [05:23<00:35,  1.95it/s]
+----- stdout -----
+train_batch (3.190):  90%|█████████ | 628/697 [05:24<00:35,  1.95it/s]
+----- stdout -----
+train_batch (3.190):  90%|█████████ | 629/697 [05:24<00:34,  1.95it/s]
+----- stdout -----
+train_batch (3.154):  90%|█████████ | 629/697 [05:24<00:34,  1.95it/s]
+----- stdout -----
+train_batch (3.154):  90%|█████████ | 630/697 [05:24<00:34,  1.95it/s]
+----- stdout -----
+train_batch (3.172):  90%|█████████ | 630/697 [05:25<00:34,  1.95it/s]
+----- stdout -----
+train_batch (3.172):  91%|█████████ | 631/697 [05:25<00:33,  1.94it/s]
+----- stdout -----
+train_batch (3.185):  91%|█████████ | 631/697 [05:25<00:33,  1.94it/s]
+----- stdout -----
+train_batch (3.185):  91%|█████████ | 632/697 [05:25<00:33,  1.93it/s]
+----- stdout -----
+train_batch (3.216):  91%|█████████ | 632/697 [05:26<00:33,  1.93it/s]
+----- stdout -----
+train_batch (3.216):  91%|█████████ | 633/697 [05:26<00:33,  1.93it/s]
+----- stdout -----
+train_batch (3.167):  91%|█████████ | 633/697 [05:26<00:33,  1.93it/s]
+----- stdout -----
+train_batch (3.167):  91%|█████████ | 634/697 [05:26<00:32,  1.94it/s]
+----- stdout -----
+train_batch (3.149):  91%|█████████ | 634/697 [05:27<00:32,  1.94it/s]
+----- stdout -----
+train_batch (3.149):  91%|█████████ | 635/697 [05:27<00:31,  1.95it/s]
+----- stdout -----
+train_batch (3.157):  91%|█████████ | 635/697 [05:27<00:31,  1.95it/s]
+----- stdout -----
+train_batch (3.157):  91%|█████████ | 636/697 [05:27<00:31,  1.95it/s]
+----- stdout -----
+train_batch (3.126):  91%|█████████ | 636/697 [05:28<00:31,  1.95it/s]
+----- stdout -----
+train_batch (3.126):  91%|█████████▏| 637/697 [05:28<00:30,  1.95it/s]
+----- stdout -----
+train_batch (3.163):  91%|█████████▏| 637/697 [05:28<00:30,  1.95it/s]
+----- stdout -----
+train_batch (3.163):  92%|█████████▏| 638/697 [05:28<00:30,  1.95it/s]
+----- stdout -----
+train_batch (3.191):  92%|█████████▏| 638/697 [05:29<00:30,  1.95it/s]
+----- stdout -----
+train_batch (3.191):  92%|█████████▏| 639/697 [05:29<00:29,  1.95it/s]
+----- stdout -----
+train_batch (3.219):  92%|█████████▏| 639/697 [05:29<00:29,  1.95it/s]
+----- stdout -----
+train_batch (3.219):  92%|█████████▏| 640/697 [05:29<00:29,  1.95it/s]
+----- stdout -----
+train_batch (3.174):  92%|█████████▏| 640/697 [05:30<00:29,  1.95it/s]
+----- stdout -----
+train_batch (3.174):  92%|█████████▏| 641/697 [05:30<00:28,  1.95it/s]
+----- stdout -----
+train_batch (3.140):  92%|█████████▏| 641/697 [05:30<00:28,  1.95it/s]
+----- stdout -----
+train_batch (3.140):  92%|█████████▏| 642/697 [05:30<00:28,  1.95it/s]
+----- stdout -----
+train_batch (3.160):  92%|█████████▏| 642/697 [05:31<00:28,  1.95it/s]
+----- stdout -----
+train_batch (3.160):  92%|█████████▏| 643/697 [05:31<00:27,  1.95it/s]
+----- stdout -----
+train_batch (3.191):  92%|█████████▏| 643/697 [05:31<00:27,  1.95it/s]
+----- stdout -----
+train_batch (3.191):  92%|█████████▏| 644/697 [05:31<00:27,  1.96it/s]
+----- stdout -----
+train_batch (3.174):  92%|█████████▏| 644/697 [05:32<00:27,  1.96it/s]
+----- stdout -----
+train_batch (3.174):  93%|█████████▎| 645/697 [05:32<00:26,  1.96it/s]
+----- stdout -----
+train_batch (3.184):  93%|█████████▎| 645/697 [05:32<00:26,  1.96it/s]
+----- stdout -----
+train_batch (3.184):  93%|█████████▎| 646/697 [05:32<00:26,  1.96it/s]
+----- stdout -----
+train_batch (3.190):  93%|█████████▎| 646/697 [05:33<00:26,  1.96it/s]
+----- stdout -----
+train_batch (3.190):  93%|█████████▎| 647/697 [05:33<00:25,  1.96it/s]
+----- stdout -----
+train_batch (3.167):  93%|█████████▎| 647/697 [05:33<00:25,  1.96it/s]
+----- stdout -----
+train_batch (3.167):  93%|█████████▎| 648/697 [05:33<00:25,  1.96it/s]
+----- stdout -----
+train_batch (3.177):  93%|█████████▎| 648/697 [05:34<00:25,  1.96it/s]
+----- stdout -----
+train_batch (3.177):  93%|█████████▎| 649/697 [05:34<00:24,  1.96it/s]
+----- stdout -----
+train_batch (3.162):  93%|█████████▎| 649/697 [05:34<00:24,  1.96it/s]
+----- stdout -----
+train_batch (3.162):  93%|█████████▎| 650/697 [05:34<00:24,  1.96it/s]
+----- stdout -----
+train_batch (3.173):  93%|█████████▎| 650/697 [05:35<00:24,  1.96it/s]
+----- stdout -----
+train_batch (3.173):  93%|█████████▎| 651/697 [05:35<00:23,  1.96it/s]
+----- stdout -----
+train_batch (3.145):  93%|█████████▎| 651/697 [05:35<00:23,  1.96it/s]
+----- stdout -----
+train_batch (3.145):  94%|█████████▎| 652/697 [05:35<00:23,  1.88it/s]
+----- stdout -----
+train_batch (3.189):  94%|█████████▎| 652/697 [05:36<00:23,  1.88it/s]
+----- stdout -----
+train_batch (3.189):  94%|█████████▎| 653/697 [05:36<00:23,  1.90it/s]
+----- stdout -----
+train_batch (3.203):  94%|█████████▎| 653/697 [05:36<00:23,  1.90it/s]
+----- stdout -----
+train_batch (3.203):  94%|█████████▍| 654/697 [05:36<00:22,  1.90it/s]
+----- stdout -----
+train_batch (3.148):  94%|█████████▍| 654/697 [05:37<00:22,  1.90it/s]
+----- stdout -----
+train_batch (3.148):  94%|█████████▍| 655/697 [05:37<00:22,  1.90it/s]
+----- stdout -----
+train_batch (3.175):  94%|█████████▍| 655/697 [05:38<00:22,  1.90it/s]
+----- stdout -----
+train_batch (3.175):  94%|█████████▍| 656/697 [05:38<00:21,  1.92it/s]
+----- stdout -----
+train_batch (3.155):  94%|█████████▍| 656/697 [05:38<00:21,  1.92it/s]
+----- stdout -----
+train_batch (3.155):  94%|█████████▍| 657/697 [05:38<00:20,  1.93it/s]
+----- stdout -----
+train_batch (3.157):  94%|█████████▍| 657/697 [05:39<00:20,  1.93it/s]
+----- stdout -----
+train_batch (3.157):  94%|█████████▍| 658/697 [05:39<00:20,  1.94it/s]
+----- stdout -----
+train_batch (3.156):  94%|█████████▍| 658/697 [05:39<00:20,  1.94it/s]
+----- stdout -----
+train_batch (3.156):  95%|█████████▍| 659/697 [05:39<00:19,  1.94it/s]
+----- stdout -----
+train_batch (3.165):  95%|█████████▍| 659/697 [05:40<00:19,  1.94it/s]
+----- stdout -----
+train_batch (3.165):  95%|█████████▍| 660/697 [05:40<00:19,  1.94it/s]
+----- stdout -----
+train_batch (3.141):  95%|█████████▍| 660/697 [05:40<00:19,  1.94it/s]
+----- stdout -----
+train_batch (3.141):  95%|█████████▍| 661/697 [05:40<00:18,  1.94it/s]
+----- stdout -----
+train_batch (3.165):  95%|█████████▍| 661/697 [05:41<00:18,  1.94it/s]
+----- stdout -----
+train_batch (3.165):  95%|█████████▍| 662/697 [05:41<00:17,  1.95it/s]
+----- stdout -----
+train_batch (3.219):  95%|█████████▍| 662/697 [05:41<00:17,  1.95it/s]
+----- stdout -----
+train_batch (3.219):  95%|█████████▌| 663/697 [05:41<00:17,  1.95it/s]
+----- stdout -----
+train_batch (3.158):  95%|█████████▌| 663/697 [05:42<00:17,  1.95it/s]
+----- stdout -----
+train_batch (3.158):  95%|█████████▌| 664/697 [05:42<00:16,  1.95it/s]
+----- stdout -----
+train_batch (3.144):  95%|█████████▌| 664/697 [05:42<00:16,  1.95it/s]
+----- stdout -----
+train_batch (3.144):  95%|█████████▌| 665/697 [05:42<00:16,  1.95it/s]
+----- stdout -----
+train_batch (3.195):  95%|█████████▌| 665/697 [05:43<00:16,  1.95it/s]
+----- stdout -----
+train_batch (3.195):  96%|█████████▌| 666/697 [05:43<00:15,  1.95it/s]
+----- stdout -----
+train_batch (3.185):  96%|█████████▌| 666/697 [05:43<00:15,  1.95it/s]
+----- stdout -----
+train_batch (3.185):  96%|█████████▌| 667/697 [05:43<00:15,  1.96it/s]
+----- stdout -----
+train_batch (3.170):  96%|█████████▌| 667/697 [05:44<00:15,  1.96it/s]
+----- stdout -----
+train_batch (3.170):  96%|█████████▌| 668/697 [05:44<00:14,  1.95it/s]
+----- stdout -----
+train_batch (3.171):  96%|█████████▌| 668/697 [05:44<00:14,  1.95it/s]
+----- stdout -----
+train_batch (3.171):  96%|█████████▌| 669/697 [05:44<00:14,  1.96it/s]
+----- stdout -----
+train_batch (3.176):  96%|█████████▌| 669/697 [05:45<00:14,  1.96it/s]
+----- stdout -----
+train_batch (3.176):  96%|█████████▌| 670/697 [05:45<00:13,  1.96it/s]
+----- stdout -----
+train_batch (3.178):  96%|█████████▌| 670/697 [05:45<00:13,  1.96it/s]
+----- stdout -----
+train_batch (3.178):  96%|█████████▋| 671/697 [05:45<00:13,  1.96it/s]
+----- stdout -----
+train_batch (3.185):  96%|█████████▋| 671/697 [05:46<00:13,  1.96it/s]
+----- stdout -----
+train_batch (3.185):  96%|█████████▋| 672/697 [05:46<00:12,  1.96it/s]
+----- stdout -----
+train_batch (3.175):  96%|█████████▋| 672/697 [05:46<00:12,  1.96it/s]
+----- stdout -----
+train_batch (3.175):  97%|█████████▋| 673/697 [05:46<00:12,  1.95it/s]
+----- stdout -----
+train_batch (3.163):  97%|█████████▋| 673/697 [05:47<00:12,  1.95it/s]
+----- stdout -----
+train_batch (3.163):  97%|█████████▋| 674/697 [05:47<00:11,  1.96it/s]
+----- stdout -----
+train_batch (3.170):  97%|█████████▋| 674/697 [05:47<00:11,  1.96it/s]
+----- stdout -----
+train_batch (3.170):  97%|█████████▋| 675/697 [05:47<00:11,  1.95it/s]
+----- stdout -----
+train_batch (3.208):  97%|█████████▋| 675/697 [05:48<00:11,  1.95it/s]
+----- stdout -----
+train_batch (3.208):  97%|█████████▋| 676/697 [05:48<00:10,  1.95it/s]
+----- stdout -----
+train_batch (3.177):  97%|█████████▋| 676/697 [05:48<00:10,  1.95it/s]
+----- stdout -----
+train_batch (3.177):  97%|█████████▋| 677/697 [05:48<00:10,  1.92it/s]
+----- stdout -----
+train_batch (3.214):  97%|█████████▋| 677/697 [05:49<00:10,  1.92it/s]
+----- stdout -----
+train_batch (3.214):  97%|█████████▋| 678/697 [05:49<00:09,  1.91it/s]
+----- stdout -----
+train_batch (3.191):  97%|█████████▋| 678/697 [05:49<00:09,  1.91it/s]
+----- stdout -----
+train_batch (3.191):  97%|█████████▋| 679/697 [05:49<00:09,  1.92it/s]
+----- stdout -----
+train_batch (3.247):  97%|█████████▋| 679/697 [05:50<00:09,  1.92it/s]
+----- stdout -----
+train_batch (3.247):  98%|█████████▊| 680/697 [05:50<00:08,  1.93it/s]
+----- stdout -----
+train_batch (3.197):  98%|█████████▊| 680/697 [05:50<00:08,  1.93it/s]
+----- stdout -----
+train_batch (3.197):  98%|█████████▊| 681/697 [05:50<00:08,  1.94it/s]
+----- stdout -----
+train_batch (3.204):  98%|█████████▊| 681/697 [05:51<00:08,  1.94it/s]
+----- stdout -----
+train_batch (3.204):  98%|█████████▊| 682/697 [05:51<00:07,  1.95it/s]
+----- stdout -----
+train_batch (3.183):  98%|█████████▊| 682/697 [05:51<00:07,  1.95it/s]
+----- stdout -----
+train_batch (3.183):  98%|█████████▊| 683/697 [05:51<00:07,  1.95it/s]
+----- stdout -----
+train_batch (3.209):  98%|█████████▊| 683/697 [05:52<00:07,  1.95it/s]
+----- stdout -----
+train_batch (3.209):  98%|█████████▊| 684/697 [05:52<00:06,  1.96it/s]
+----- stdout -----
+train_batch (3.230):  98%|█████████▊| 684/697 [05:52<00:06,  1.96it/s]
+----- stdout -----
+train_batch (3.230):  98%|█████████▊| 685/697 [05:52<00:06,  1.95it/s]
+----- stdout -----
+train_batch (3.193):  98%|█████████▊| 685/697 [05:53<00:06,  1.95it/s]
+----- stdout -----
+train_batch (3.193):  98%|█████████▊| 686/697 [05:53<00:05,  1.95it/s]
+----- stdout -----
+train_batch (3.162):  98%|█████████▊| 686/697 [05:53<00:05,  1.95it/s]
+----- stdout -----
+train_batch (3.162):  99%|█████████▊| 687/697 [05:53<00:05,  1.95it/s]
+----- stdout -----
+train_batch (3.145):  99%|█████████▊| 687/697 [05:54<00:05,  1.95it/s]
+----- stdout -----
+train_batch (3.145):  99%|█████████▊| 688/697 [05:54<00:04,  1.96it/s]
+----- stdout -----
+train_batch (3.210):  99%|█████████▊| 688/697 [05:54<00:04,  1.96it/s]
+----- stdout -----
+train_batch (3.210):  99%|█████████▉| 689/697 [05:54<00:04,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  99%|█████████▉| 689/697 [05:55<00:04,  1.95it/s]
+----- stdout -----
+train_batch (3.176):  99%|█████████▉| 690/697 [05:55<00:03,  1.95it/s]
+----- stdout -----
+train_batch (3.193):  99%|█████████▉| 690/697 [05:55<00:03,  1.95it/s]
+----- stdout -----
+train_batch (3.193):  99%|█████████▉| 691/697 [05:55<00:03,  1.96it/s]
+----- stdout -----
+train_batch (3.210):  99%|█████████▉| 691/697 [05:56<00:03,  1.96it/s]
+----- stdout -----
+train_batch (3.210):  99%|█████████▉| 692/697 [05:56<00:02,  1.96it/s]
+----- stdout -----
+train_batch (3.184):  99%|█████████▉| 692/697 [05:56<00:02,  1.96it/s]
+----- stdout -----
+train_batch (3.184):  99%|█████████▉| 693/697 [05:56<00:02,  1.96it/s]
+----- stdout -----
+train_batch (3.165):  99%|█████████▉| 693/697 [05:57<00:02,  1.96it/s]
+----- stdout -----
+train_batch (3.165): 100%|█████████▉| 694/697 [05:57<00:01,  1.96it/s]
+----- stdout -----
+train_batch (3.213): 100%|█████████▉| 694/697 [05:58<00:01,  1.96it/s]
+----- stdout -----
+train_batch (3.213): 100%|█████████▉| 695/697 [05:58<00:01,  1.96it/s]
+----- stdout -----
+train_batch (3.195): 100%|█████████▉| 695/697 [05:58<00:01,  1.96it/s]
+----- stdout -----
+train_batch (3.195): 100%|█████████▉| 696/697 [05:58<00:00,  1.96it/s]
+----- stdout -----
+train_batch (3.222): 100%|█████████▉| 696/697 [05:59<00:00,  1.96it/s]
+----- stdout -----
+train_batch (3.222): 100%|██████████| 697/697 [05:59<00:00,  1.96it/s]
+----- stdout -----
+train_batch (Avg. Loss 3.181, Accuracy 23.2): 100%|██████████| 697/697 [05:59<00:00,  1.96it/s]
+----- stdout -----
+train_batch (Avg. Loss 3.181, Accuracy 23.2): 100%|██████████| 697/697 [05:59<00:00,  1.94it/s]
+----- stdout -----
+
+----- stdout -----
+test_batch:   0%|          | 0/77 [00:00<?, ?it/s]
+----- stdout -----
+test_batch (3.359):   0%|          | 0/77 [00:00<?, ?it/s]
+----- stdout -----
+test_batch (3.359):   1%|▏         | 1/77 [00:00<00:12,  6.13it/s]
+----- stdout -----
+test_batch (3.340):   1%|▏         | 1/77 [00:00<00:12,  6.13it/s]
+----- stdout -----
+test_batch (3.340):   3%|▎         | 2/77 [00:00<00:12,  6.08it/s]
+----- stdout -----
+test_batch (3.321):   3%|▎         | 2/77 [00:00<00:12,  6.08it/s]
+----- stdout -----
+test_batch (3.321):   4%|▍         | 3/77 [00:00<00:12,  6.06it/s]
+----- stdout -----
+test_batch (3.324):   4%|▍         | 3/77 [00:00<00:12,  6.06it/s]
+----- stdout -----
+test_batch (3.324):   5%|▌         | 4/77 [00:00<00:12,  6.05it/s]
+----- stdout -----
+test_batch (3.387):   5%|▌         | 4/77 [00:00<00:12,  6.05it/s]
+----- stdout -----
+test_batch (3.387):   6%|▋         | 5/77 [00:00<00:11,  6.03it/s]
+----- stdout -----
+test_batch (3.368):   6%|▋         | 5/77 [00:00<00:11,  6.03it/s]
+----- stdout -----
+test_batch (3.368):   8%|▊         | 6/77 [00:00<00:11,  6.01it/s]
+----- stdout -----
+test_batch (3.354):   8%|▊         | 6/77 [00:01<00:11,  6.01it/s]
+----- stdout -----
+test_batch (3.354):   9%|▉         | 7/77 [00:01<00:11,  5.93it/s]
+----- stdout -----
+test_batch (3.370):   9%|▉         | 7/77 [00:01<00:11,  5.93it/s]
+----- stdout -----
+test_batch (3.370):  10%|█         | 8/77 [00:01<00:11,  5.90it/s]
+----- stdout -----
+test_batch (3.338):  10%|█         | 8/77 [00:01<00:11,  5.90it/s]
+----- stdout -----
+test_batch (3.338):  12%|█▏        | 9/77 [00:01<00:11,  5.94it/s]
+----- stdout -----
+test_batch (3.363):  12%|█▏        | 9/77 [00:01<00:11,  5.94it/s]
+----- stdout -----
+test_batch (3.363):  13%|█▎        | 10/77 [00:01<00:11,  5.97it/s]
+----- stdout -----
+test_batch (3.350):  13%|█▎        | 10/77 [00:01<00:11,  5.97it/s]
+----- stdout -----
+test_batch (3.350):  14%|█▍        | 11/77 [00:01<00:11,  5.98it/s]
+----- stdout -----
+test_batch (3.367):  14%|█▍        | 11/77 [00:02<00:11,  5.98it/s]
+----- stdout -----
+test_batch (3.367):  16%|█▌        | 12/77 [00:02<00:10,  6.00it/s]
+----- stdout -----
+test_batch (3.366):  16%|█▌        | 12/77 [00:02<00:10,  6.00it/s]
+----- stdout -----
+test_batch (3.366):  17%|█▋        | 13/77 [00:02<00:10,  6.01it/s]
+----- stdout -----
+test_batch (3.337):  17%|█▋        | 13/77 [00:02<00:10,  6.01it/s]
+----- stdout -----
+test_batch (3.337):  18%|█▊        | 14/77 [00:02<00:10,  6.02it/s]
+----- stdout -----
+test_batch (3.338):  18%|█▊        | 14/77 [00:02<00:10,  6.02it/s]
+----- stdout -----
+test_batch (3.338):  19%|█▉        | 15/77 [00:02<00:10,  6.03it/s]
+----- stdout -----
+test_batch (3.392):  19%|█▉        | 15/77 [00:02<00:10,  6.03it/s]
+----- stdout -----
+test_batch (3.392):  21%|██        | 16/77 [00:02<00:10,  6.04it/s]
+----- stdout -----
+test_batch (3.352):  21%|██        | 16/77 [00:02<00:10,  6.04it/s]
+----- stdout -----
+test_batch (3.352):  22%|██▏       | 17/77 [00:02<00:09,  6.04it/s]
+----- stdout -----
+test_batch (3.367):  22%|██▏       | 17/77 [00:02<00:09,  6.04it/s]
+----- stdout -----
+test_batch (3.367):  23%|██▎       | 18/77 [00:02<00:09,  6.04it/s]
+----- stdout -----
+test_batch (3.358):  23%|██▎       | 18/77 [00:03<00:09,  6.04it/s]
+----- stdout -----
+test_batch (3.358):  25%|██▍       | 19/77 [00:03<00:09,  6.05it/s]
+----- stdout -----
+test_batch (3.362):  25%|██▍       | 19/77 [00:03<00:09,  6.05it/s]
+----- stdout -----
+test_batch (3.362):  26%|██▌       | 20/77 [00:03<00:09,  6.05it/s]
+----- stdout -----
+test_batch (3.363):  26%|██▌       | 20/77 [00:03<00:09,  6.05it/s]
+----- stdout -----
+test_batch (3.363):  27%|██▋       | 21/77 [00:03<00:09,  6.05it/s]
+----- stdout -----
+test_batch (3.380):  27%|██▋       | 21/77 [00:03<00:09,  6.05it/s]
+----- stdout -----
+test_batch (3.380):  29%|██▊       | 22/77 [00:03<00:09,  6.05it/s]
+----- stdout -----
+test_batch (3.438):  29%|██▊       | 22/77 [00:03<00:09,  6.05it/s]
+----- stdout -----
+test_batch (3.438):  30%|██▉       | 23/77 [00:03<00:08,  6.05it/s]
+----- stdout -----
+test_batch (3.388):  30%|██▉       | 23/77 [00:03<00:08,  6.05it/s]
+----- stdout -----
+test_batch (3.388):  31%|███       | 24/77 [00:03<00:08,  6.06it/s]
+----- stdout -----
+test_batch (3.380):  31%|███       | 24/77 [00:04<00:08,  6.06it/s]
+----- stdout -----
+test_batch (3.380):  32%|███▏      | 25/77 [00:04<00:08,  6.06it/s]
+----- stdout -----
+test_batch (3.394):  32%|███▏      | 25/77 [00:04<00:08,  6.06it/s]
+----- stdout -----
+test_batch (3.394):  34%|███▍      | 26/77 [00:04<00:08,  6.06it/s]
+----- stdout -----
+test_batch (3.371):  34%|███▍      | 26/77 [00:04<00:08,  6.06it/s]
+----- stdout -----
+test_batch (3.371):  35%|███▌      | 27/77 [00:04<00:08,  6.06it/s]
+----- stdout -----
+test_batch (3.394):  35%|███▌      | 27/77 [00:04<00:08,  6.06it/s]
+----- stdout -----
+test_batch (3.394):  36%|███▋      | 28/77 [00:04<00:08,  6.06it/s]
+----- stdout -----
+test_batch (3.410):  36%|███▋      | 28/77 [00:04<00:08,  6.06it/s]
+----- stdout -----
+test_batch (3.410):  38%|███▊      | 29/77 [00:04<00:07,  6.03it/s]
+----- stdout -----
+test_batch (3.364):  38%|███▊      | 29/77 [00:04<00:07,  6.03it/s]
+----- stdout -----
+test_batch (3.364):  39%|███▉      | 30/77 [00:04<00:07,  6.04it/s]
+----- stdout -----
+test_batch (3.351):  39%|███▉      | 30/77 [00:05<00:07,  6.04it/s]
+----- stdout -----
+test_batch (3.351):  40%|████      | 31/77 [00:05<00:07,  6.04it/s]
+----- stdout -----
+test_batch (3.346):  40%|████      | 31/77 [00:05<00:07,  6.04it/s]
+----- stdout -----
+test_batch (3.346):  42%|████▏     | 32/77 [00:05<00:07,  6.04it/s]
+----- stdout -----
+test_batch (3.367):  42%|████▏     | 32/77 [00:05<00:07,  6.04it/s]
+----- stdout -----
+test_batch (3.367):  43%|████▎     | 33/77 [00:05<00:07,  6.04it/s]
+----- stdout -----
+test_batch (3.369):  43%|████▎     | 33/77 [00:05<00:07,  6.04it/s]
+----- stdout -----
+test_batch (3.369):  44%|████▍     | 34/77 [00:05<00:07,  6.05it/s]
+----- stdout -----
+test_batch (3.377):  44%|████▍     | 34/77 [00:05<00:07,  6.05it/s]
+----- stdout -----
+test_batch (3.377):  45%|████▌     | 35/77 [00:05<00:06,  6.05it/s]
+----- stdout -----
+test_batch (3.372):  45%|████▌     | 35/77 [00:05<00:06,  6.05it/s]
+----- stdout -----
+test_batch (3.372):  47%|████▋     | 36/77 [00:05<00:06,  6.06it/s]
+----- stdout -----
+test_batch (3.392):  47%|████▋     | 36/77 [00:06<00:06,  6.06it/s]
+----- stdout -----
+test_batch (3.392):  48%|████▊     | 37/77 [00:06<00:06,  6.06it/s]
+----- stdout -----
+test_batch (3.371):  48%|████▊     | 37/77 [00:06<00:06,  6.06it/s]
+----- stdout -----
+test_batch (3.371):  49%|████▉     | 38/77 [00:06<00:06,  6.07it/s]
+----- stdout -----
+test_batch (3.320):  49%|████▉     | 38/77 [00:06<00:06,  6.07it/s]
+----- stdout -----
+test_batch (3.320):  51%|█████     | 39/77 [00:06<00:06,  6.06it/s]
+----- stdout -----
+test_batch (3.366):  51%|█████     | 39/77 [00:06<00:06,  6.06it/s]
+----- stdout -----
+test_batch (3.366):  52%|█████▏    | 40/77 [00:06<00:06,  6.06it/s]
+----- stdout -----
+test_batch (3.363):  52%|█████▏    | 40/77 [00:06<00:06,  6.06it/s]
+----- stdout -----
+test_batch (3.363):  53%|█████▎    | 41/77 [00:06<00:05,  6.06it/s]
+----- stdout -----
+test_batch (3.336):  53%|█████▎    | 41/77 [00:06<00:05,  6.06it/s]
+----- stdout -----
+test_batch (3.336):  55%|█████▍    | 42/77 [00:06<00:05,  6.06it/s]
+----- stdout -----
+test_batch (3.374):  55%|█████▍    | 42/77 [00:07<00:05,  6.06it/s]
+----- stdout -----
+test_batch (3.374):  56%|█████▌    | 43/77 [00:07<00:05,  6.06it/s]
+----- stdout -----
+test_batch (3.382):  56%|█████▌    | 43/77 [00:07<00:05,  6.06it/s]
+----- stdout -----
+test_batch (3.382):  57%|█████▋    | 44/77 [00:07<00:05,  6.06it/s]
+----- stdout -----
+test_batch (3.375):  57%|█████▋    | 44/77 [00:07<00:05,  6.06it/s]
+----- stdout -----
+test_batch (3.375):  58%|█████▊    | 45/77 [00:07<00:05,  6.06it/s]
+----- stdout -----
+test_batch (3.376):  58%|█████▊    | 45/77 [00:07<00:05,  6.06it/s]
+----- stdout -----
+test_batch (3.376):  60%|█████▉    | 46/77 [00:07<00:05,  6.05it/s]
+----- stdout -----
+test_batch (3.378):  60%|█████▉    | 46/77 [00:07<00:05,  6.05it/s]
+----- stdout -----
+test_batch (3.378):  61%|██████    | 47/77 [00:07<00:04,  6.06it/s]
+----- stdout -----
+test_batch (3.372):  61%|██████    | 47/77 [00:07<00:04,  6.06it/s]
+----- stdout -----
+test_batch (3.372):  62%|██████▏   | 48/77 [00:07<00:04,  6.06it/s]
+----- stdout -----
+test_batch (3.335):  62%|██████▏   | 48/77 [00:08<00:04,  6.06it/s]
+----- stdout -----
+test_batch (3.335):  64%|██████▎   | 49/77 [00:08<00:04,  6.06it/s]
+----- stdout -----
+test_batch (3.371):  64%|██████▎   | 49/77 [00:08<00:04,  6.06it/s]
+----- stdout -----
+test_batch (3.371):  65%|██████▍   | 50/77 [00:08<00:04,  6.06it/s]
+----- stdout -----
+test_batch (3.356):  65%|██████▍   | 50/77 [00:08<00:04,  6.06it/s]
+----- stdout -----
+test_batch (3.356):  66%|██████▌   | 51/77 [00:08<00:04,  6.06it/s]
+----- stdout -----
+test_batch (3.344):  66%|██████▌   | 51/77 [00:08<00:04,  6.06it/s]
+----- stdout -----
+test_batch (3.344):  68%|██████▊   | 52/77 [00:08<00:04,  6.06it/s]
+----- stdout -----
+test_batch (3.367):  68%|██████▊   | 52/77 [00:08<00:04,  6.06it/s]
+----- stdout -----
+test_batch (3.367):  69%|██████▉   | 53/77 [00:08<00:03,  6.06it/s]
+----- stdout -----
+test_batch (3.380):  69%|██████▉   | 53/77 [00:08<00:03,  6.06it/s]
+----- stdout -----
+test_batch (3.380):  70%|███████   | 54/77 [00:08<00:03,  6.06it/s]
+----- stdout -----
+test_batch (3.388):  70%|███████   | 54/77 [00:09<00:03,  6.06it/s]
+----- stdout -----
+test_batch (3.388):  71%|███████▏  | 55/77 [00:09<00:03,  6.05it/s]
+----- stdout -----
+test_batch (3.343):  71%|███████▏  | 55/77 [00:09<00:03,  6.05it/s]
+----- stdout -----
+test_batch (3.343):  73%|███████▎  | 56/77 [00:09<00:03,  6.05it/s]
+----- stdout -----
+test_batch (3.391):  73%|███████▎  | 56/77 [00:09<00:03,  6.05it/s]
+----- stdout -----
+test_batch (3.391):  74%|███████▍  | 57/77 [00:09<00:03,  6.04it/s]
+----- stdout -----
+test_batch (3.388):  74%|███████▍  | 57/77 [00:09<00:03,  6.04it/s]
+----- stdout -----
+test_batch (3.388):  75%|███████▌  | 58/77 [00:09<00:03,  6.04it/s]
+----- stdout -----
+test_batch (3.376):  75%|███████▌  | 58/77 [00:09<00:03,  6.04it/s]
+----- stdout -----
+test_batch (3.376):  77%|███████▋  | 59/77 [00:09<00:02,  6.05it/s]
+----- stdout -----
+test_batch (3.376):  77%|███████▋  | 59/77 [00:09<00:02,  6.05it/s]
+----- stdout -----
+test_batch (3.376):  78%|███████▊  | 60/77 [00:09<00:02,  6.03it/s]
+----- stdout -----
+test_batch (3.343):  78%|███████▊  | 60/77 [00:10<00:02,  6.03it/s]
+----- stdout -----
+test_batch (3.343):  79%|███████▉  | 61/77 [00:10<00:02,  6.03it/s]
+----- stdout -----
+test_batch (3.359):  79%|███████▉  | 61/77 [00:10<00:02,  6.03it/s]
+----- stdout -----
+test_batch (3.359):  81%|████████  | 62/77 [00:10<00:02,  6.04it/s]
+----- stdout -----
+test_batch (3.354):  81%|████████  | 62/77 [00:10<00:02,  6.04it/s]
+----- stdout -----
+test_batch (3.354):  82%|████████▏ | 63/77 [00:10<00:02,  6.04it/s]
+----- stdout -----
+test_batch (3.379):  82%|████████▏ | 63/77 [00:10<00:02,  6.04it/s]
+----- stdout -----
+test_batch (3.379):  83%|████████▎ | 64/77 [00:10<00:02,  6.05it/s]
+----- stdout -----
+test_batch (3.374):  83%|████████▎ | 64/77 [00:10<00:02,  6.05it/s]
+----- stdout -----
+test_batch (3.374):  84%|████████▍ | 65/77 [00:10<00:01,  6.03it/s]
+----- stdout -----
+test_batch (3.360):  84%|████████▍ | 65/77 [00:10<00:01,  6.03it/s]
+----- stdout -----
+test_batch (3.360):  86%|████████▌ | 66/77 [00:10<00:01,  6.03it/s]
+----- stdout -----
+test_batch (3.392):  86%|████████▌ | 66/77 [00:11<00:01,  6.03it/s]
+----- stdout -----
+test_batch (3.392):  87%|████████▋ | 67/77 [00:11<00:01,  6.04it/s]
+----- stdout -----
+test_batch (3.360):  87%|████████▋ | 67/77 [00:11<00:01,  6.04it/s]
+----- stdout -----
+test_batch (3.360):  88%|████████▊ | 68/77 [00:11<00:01,  6.04it/s]
+----- stdout -----
+test_batch (3.367):  88%|████████▊ | 68/77 [00:11<00:01,  6.04it/s]
+----- stdout -----
+test_batch (3.367):  90%|████████▉ | 69/77 [00:11<00:01,  6.04it/s]
+----- stdout -----
+test_batch (3.358):  90%|████████▉ | 69/77 [00:11<00:01,  6.04it/s]
+----- stdout -----
+test_batch (3.358):  91%|█████████ | 70/77 [00:11<00:01,  6.05it/s]
+----- stdout -----
+test_batch (3.350):  91%|█████████ | 70/77 [00:11<00:01,  6.05it/s]
+----- stdout -----
+test_batch (3.350):  92%|█████████▏| 71/77 [00:11<00:00,  6.04it/s]
+----- stdout -----
+test_batch (3.360):  92%|█████████▏| 71/77 [00:11<00:00,  6.04it/s]
+----- stdout -----
+test_batch (3.360):  94%|█████████▎| 72/77 [00:11<00:00,  6.03it/s]
+----- stdout -----
+test_batch (3.348):  94%|█████████▎| 72/77 [00:12<00:00,  6.03it/s]
+----- stdout -----
+test_batch (3.348):  95%|█████████▍| 73/77 [00:12<00:00,  6.04it/s]
+----- stdout -----
+test_batch (3.382):  95%|█████████▍| 73/77 [00:12<00:00,  6.04it/s]
+----- stdout -----
+test_batch (3.382):  96%|█████████▌| 74/77 [00:12<00:00,  6.04it/s]
+----- stdout -----
+test_batch (3.366):  96%|█████████▌| 74/77 [00:12<00:00,  6.04it/s]
+----- stdout -----
+test_batch (3.366):  97%|█████████▋| 75/77 [00:12<00:00,  6.05it/s]
+----- stdout -----
+test_batch (3.360):  97%|█████████▋| 75/77 [00:12<00:00,  6.05it/s]
+----- stdout -----
+test_batch (3.360):  99%|█████████▊| 76/77 [00:12<00:00,  6.05it/s]
+----- stdout -----
+test_batch (3.332):  99%|█████████▊| 76/77 [00:12<00:00,  6.05it/s]
+----- stdout -----
+test_batch (3.332): 100%|██████████| 77/77 [00:12<00:00,  6.05it/s]
+----- stdout -----
+test_batch (Avg. Loss 3.365, Accuracy 15.2): 100%|██████████| 77/77 [00:12<00:00,  6.05it/s]
+----- stdout -----
+test_batch (Avg. Loss 3.365, Accuracy 15.2): 100%|██████████| 77/77 [00:12<00:00,  6.04it/s]
+----- stdout -----
+
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mUnboundLocalError[0m                         Traceback (most recent call last)
+Cell [0;32mIn[20], line 25[0m
+[1;32m     21[0m [38;5;28;01mtry[39;00m:
+[1;32m     22[0m     [38;5;66;03m# Print pre-training sampling[39;00m
+[1;32m     23[0m     [38;5;28mprint[39m(charnn[38;5;241m.[39mgenerate_from_model(model, [38;5;124m"[39m[38;5;124mACT I.[39m[38;5;124m"[39m, [38;5;241m100[39m, (char_to_idx,idx_to_char), T[38;5;241m=[39m[38;5;241m0.5[39m))
+[0;32m---> 25[0m     fit_res [38;5;241m=[39m [43mtrainer[49m[38;5;241;43m.[39;49m[43mfit[49m[43m([49m[43mdl_train[49m[43m,[49m[43m [49m[43mdl_test[49m[43m,[49m[43m [49m[43mnum_epochs[49m[43m,[49m[43m [49m[43mmax_batches[49m[38;5;241;43m=[39;49m[38;5;28;43;01mNone[39;49;00m[43m,[49m
+[1;32m     26[0m [43m                          [49m[43mpost_epoch_fn[49m[38;5;241;43m=[39;49m[43mpost_epoch_fn[49m[43m,[49m[43m [49m[43mearly_stopping[49m[38;5;241;43m=[39;49m[43mearly_stopping[49m[43m,[49m
+[1;32m     27[0m [43m                          [49m[43mcheckpoints[49m[38;5;241;43m=[39;49m[43mcheckpoint_file[49m[43m,[49m[43m [49m[43mprint_every[49m[38;5;241;43m=[39;49m[38;5;241;43m1[39;49m[43m)[49m
+[1;32m     29[0m     fig, axes [38;5;241m=[39m plot_fit(fit_res)
+[1;32m     30[0m [38;5;28;01mexcept[39;00m [38;5;167;01mKeyboardInterrupt[39;00m [38;5;28;01mas[39;00m e:
+
+File [0;32m~/hw3/hw3_spring_23/hw3/training.py:106[0m, in [0;36mTrainer.fit[0;34m(self, dl_train, dl_test, num_epochs, checkpoints, early_stopping, print_every, post_epoch_fn, **kw)[0m
+[1;32m    103[0m test_loss[38;5;241m.[39mappend(epoch_result_test[38;5;241m.[39mlosses)
+[1;32m    104[0m test_acc[38;5;241m.[39mappend(epoch_result_test[38;5;241m.[39maccuracy)
+[0;32m--> 106[0m [38;5;28;01mif[39;00m [43mbest_accuracy[49m [38;5;241m==[39m [38;5;28;01mNone[39;00m [38;5;129;01mor[39;00m epoch_result_test[38;5;241m.[39maccuracy [38;5;241m>[39m best_accuracy:
+[1;32m    107[0m     best_accuracy [38;5;241m=[39m epoch_result_test[38;5;241m.[39maccuracy
+[1;32m    108[0m     save_checkpoint [38;5;241m=[39m [38;5;28;01mTrue[39;00m
+
+[0;31mUnboundLocalError[0m: local variable 'best_accuracy' referenced before assignment
+
+Got errors while executing notebook Part1_Sequence.ipynb. Make sure you've implemented everything and that all tests pass.
+>> Running 1 notebooks...
+>> Running nbconvert on notebook Part1_Sequence.ipynb [execute|inplace]

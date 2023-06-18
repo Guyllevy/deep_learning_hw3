@@ -188,6 +188,7 @@ def generate_from_model(model, start_sequence, n_chars, char_maps, T):
     #  See torch.no_grad().
     # ====== YOUR CODE: ======
     char_to_idx, idx_to_char = char_maps
+    model.train(False)
 
     # feeding model with start seuence
     x0 = chars_to_onehot(start_sequence, char_to_idx).unsqueeze(dim = 0).to(device)

@@ -93,8 +93,27 @@ class Trainer(abc.ABC):
             #  - Implement early stopping. This is a very useful and
             #    simple regularization technique that is highly recommended.
             # ====== YOUR CODE: ======
-            
-            raise NotImplementedError()
+            actual_num_epochs += 1
+
+            kw['verbose'] = verbose
+            train_result = self.train_epoch(dl_train, **kw)
+            test_result = self.test_epoch(dl_test, **kw)
+
+            train_loss.append(train_result.losses)
+            train_acc.append(train_result.accuracy)
+            test_loss.append(test_result.losses)
+            test_acc.append(test_result.accuracy)
+
+            if best_acc == None or test_result.accuracy > best_acc:
+                best_acc = test_result.accuracy
+                save_checkpoint = True
+                epochs_without_improvement = 0
+            else:
+                epochs_without_improvement += 1
+
+            # early stopping
+            if epochs_without_improvement > early_stopping:
+                break
 
             # ========================
 
@@ -286,7 +305,20 @@ class RNNTrainer(Trainer):
             #  - Loss calculation
             #  - Calculate number of correct predictions
             # ====== YOUR CODE: ======
-            raise NotImplementedError()
+            
+            # forward
+            y_pred , h = self.model(x, self.hidden_state)
+            self.hidden_state = h
+
+            # loss
+            y_pred = y_pred.view(-1, y_pred.shape[2])  # (B * S, V)
+            y = y.view(-1)  # (B * S)
+            loss = self.loss_fn(y_pred, y)
+
+            # num_correct
+            _, predicted_idx = torch.max(y_pred, 1)  # (B * S,)
+            num_correct = (predicted_idx == y).sum()
+            
             # ========================
 
         return BatchResult(loss.item(), num_correct.item() / seq_len)
