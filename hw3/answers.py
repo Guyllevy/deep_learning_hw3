@@ -88,6 +88,15 @@ def part2_vae_hyperparams():
     )
     # TODO: Tweak the hyperparameters to generate a former president.
     # ====== YOUR CODE: ======
+    hypers = dict(
+        batch_size=256,
+        h_dim=256,
+        z_dim=32,
+        x_sigma2=0.1,
+        learn_rate=0.001,
+        betas=(0.9, 0.999)
+    )
+    
    
     # ========================
     return hypers
@@ -95,26 +104,31 @@ def part2_vae_hyperparams():
 
 part2_q1 = r"""
 **Your answer:**
+The hyperparameter x_sigma2 in a VAE controls the reconstruction variance.
 
+Low values prioritize accurate reconstructions, resulting in sharp and detailed outputs. However, there is a risk of overfitting.
+High values allow more tolerance for imperfections, leading to smoother and blurred outputs. It emphasizes the regularization component but may sacrifice reconstruction quality.
 
 """
 
 part2_q2 = r"""
 **Your answer:**
-
+1.The reconstruction loss ensures accurate reconstructions, while the KL divergence loss encourages a well-structured latent space. Both components help the VAE learn to generate faithful reconstructions and capture the underlying distribution of the input data.
+2.The KL divergence loss term encourages the latent-space distribution in a VAE to align with a predefined prior distribution. It promotes smoothness, captures underlying structure, and controls the capacity of the latent space.
+3.KL divergence loss in a VAE leads to improved interpretability of the latent space, effective data compression, and controlled generation with regularization. These benefits enable various applications and enhance the model's capabilities in understanding and generating complex data distributions.
 
 """
 
 part2_q3 = r"""
 **Your answer:**
-
+ starting by maximizing the evidence distribution allows the VAE to perform variational inference, approximate the true posterior, and balance reconstruction accuracy with latent space regularization. It enables the VAE to learn a compressed and meaningful representation of the data while generating accurate reconstructions.
 
 
 """
 
 part2_q4 = r"""
 **Your answer:**
-
+modeling the logarithm of the latent-space variance in the VAE encoder ensures numerical stability, provides flexibility for representing a wide range of variances, and encourages exploration in the latent space.
 
 """
 
