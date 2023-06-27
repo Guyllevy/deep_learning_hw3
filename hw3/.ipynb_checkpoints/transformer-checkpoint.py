@@ -37,10 +37,14 @@ def sliding_window_attention(q, k, v, window_size, padding_mask=None):
     # and then will get B by summing tile Q * filter * tile K over the embedding dimention
 
     # creating filter:
-    cols_enum = torch.ones((batch_size, seq_len, seq_len)) * torch.arange(0,seq_len)
+    cols_enum = torch.ones((*q.shape[:-1], seq_len)) * torch.arange(0,seq_len)
     rows_enum = torch.transpose(cols_enum, -2, -1)
     
-    fil = torch.where(torch.abs(rows_enum - cols_enum) < window_size // 2 +0.1, 1.0,0.0)
+    fil = torch.where(torch.abs(rows_enum - cols_enum) < window_size // 2 +0.1, 1.0, 0.0)
+    if padding_mask != None:
+        if len(fil.shape) == 4:
+            padding_mask = padding_mask.unsqueeze(1) # heads dimention
+        fil *= padding_mask.unsqueeze(-1)
     fil = fil.unsqueeze(-1)
     fil = fil.tile((embed_dim))
 
@@ -48,21 +52,10 @@ def sliding_window_attention(q, k, v, window_size, padding_mask=None):
     tile_Q = torch.tile(torch.unsqueeze(q,-3), (seq_len,1,1)).transpose(-2,-3)
     tile_K = torch.tile(torch.unsqueeze(k,-3), (seq_len,1,1))
 
-    # normalization factor
-
-    if tile_K.shape != fil.shape:
-        print("shout")
-    if tile_Q.shape != fil.shape:
-        print("scream")
-
-    print("tileQ shape:", tile_Q.shape)
-    print("tileK shape:", tile_K.shape)
-    print("fil shape:", fil.shape)
     B = torch.sum(tile_Q * fil * tile_K, dim = -1) / (embed_dim ** 0.5)
     B = torch.where(B == 0, torch.full_like(B, -float('inf')), B)
-    print("B shape:", B.shape)
+
     attention = torch.softmax(B, dim = -1) # softmax on rows
-    print("V shape:", v.shape)
 
     values = attention @ v
     # ========================
@@ -111,7 +104,7 @@ class MultiHeadAttention(nn.Module):
         # TODO:
         # call the sliding window attention function you implemented
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        values, attention = sliding_window_attention(q, k, v, self.window_size, padding_mask=padding_mask)
         # ========================
 
         values = values.permute(0, 2, 1, 3) # [Batch, SeqLen, Head, Dims]
@@ -193,7 +186,12 @@ class EncoderLayer(nn.Module):
         #   3) Apply a feed-forward layer to the output of step 2, and then apply dropout again.
         #   4) Add a second residual connection and normalize again.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        h1 = self.self_attn(x,padding_mask)
+        h1 = self.dropout(h1)
+        h1 = self.norm1(x + h1)
+        h2 = self.feed_forward(h1)
+        h2 = self.dropout(h2)
+        x = self.norm2(h1 + h2)
         # ========================
         
         return x
