@@ -33,31 +33,77 @@ def sliding_window_attention(q, k, v, window_size, padding_mask=None):
     #    (both for tokens that aren't in the window, and for tokens that correspond to padding according to the 'padding mask').
     # Aside from these two rules, you are free to implement the function as you wish. 
     # ====== YOUR CODE: ======
-    # Will tile Q, tile K, make a filter which will allow to make only window-close multyplications
-    # and then will get B by summing tile Q * filter * tile K over the embedding dimention
 
-    # creating filter:
-    cols_enum = torch.ones((*q.shape[:-1], seq_len)) * torch.arange(0,seq_len)
-    rows_enum = torch.transpose(cols_enum, -2, -1)
+    # attempt 2
+    num_heads = 1
+    heads_dim = False
+    if len(q.shape) == 4:
+        heads_dim = True
+        num_heads = q.shape[1]
+        k = k.view((batch_size*num_heads, seq_len, embed_dim))
+        q = q.view((batch_size*num_heads, seq_len, embed_dim))
+
     
-    fil = torch.where(torch.abs(rows_enum - cols_enum) < window_size // 2 +0.1, 1.0, 0.0)
-    if padding_mask != None:
-        if len(fil.shape) == 4:
-            padding_mask = padding_mask.unsqueeze(1) # heads dimention
-        fil *= padding_mask.unsqueeze(-1)
-    fil = fil.unsqueeze(-1)
-    fil = fil.tile((embed_dim))
+    pad = torch.zeros((batch_size*num_heads,window_size//2, embed_dim))
+    padded_q = torch.cat((pad,q,pad), dim = 1)
+    stride = padded_q.stride()
+    strided_q = padded_q.as_strided((batch_size*num_heads, seq_len, window_size+1, embed_dim), (stride[0], stride[1], stride[1], stride[2]))
 
-    # tileing Q and K
-    tile_Q = torch.tile(torch.unsqueeze(q,-3), (seq_len,1,1)).transpose(-2,-3)
-    tile_K = torch.tile(torch.unsqueeze(k,-3), (seq_len,1,1))
+    # fill B with -inf
+    B = torch.full((batch_size*num_heads, seq_len + window_size, seq_len + window_size), float('-inf')) # extra big
 
-    B = torch.sum(tile_Q * fil * tile_K, dim = -1) / (embed_dim ** 0.5)
-    B = torch.where(B == 0, torch.full_like(B, -float('inf')), B)
+    # T the B vaules we got from keys dot window-close queries. 
+    T = (strided_q @ k.unsqueeze(-2).transpose(-1,-2)).squeeze(-1)
 
-    attention = torch.softmax(B, dim = -1) # softmax on rows
+    # index into B to put T values in the right places
+    i_batch = torch.arange(batch_size*num_heads).repeat_interleave(seq_len*(window_size+1)).tolist()
+    i_rows = torch.arange(window_size//2,seq_len+window_size//2).repeat_interleave(window_size+1).repeat(batch_size*num_heads).tolist()
+    i_cols = (torch.arange(window_size+1).repeat(seq_len) + torch.arange(seq_len).repeat_interleave(window_size+1)).repeat(batch_size*num_heads).tolist()
+
+    index = [i_batch, i_rows, i_cols]
+
+    B[index] = T.flatten()
+    B = B[:,window_size//2:-window_size//2,window_size//2:-window_size//2] # cut extra
+    B /= embed_dim ** 0.5 # normalize
+
+    # softmax B to get attention as usual
+    attention = torch.softmax(B, dim = -1)
+
+    if heads_dim == True:
+        attention = attention.view(batch_size, num_heads, seq_len, seq_len)
 
     values = attention @ v
+    
+    # attempt 1 - wait thats illegal
+    # # Will tile q, tile k, make a filter which will allow to make only window-close multyplications
+    # # and then will get B by summing tile q * filter * tile K over the embedding dimention
+
+    # # creating filter:
+    # cols_enum = torch.ones((*q.shape[:-1], seq_len)) * torch.arange(0,seq_len)
+    # rows_enum = torch.transpose(cols_enum, -2, -1)
+    
+    # fil = torch.where(torch.abs(rows_enum - cols_enum) < window_size // 2 +0.1, 1.0, 0.0)
+    # if padding_mask != None:
+    #     if len(fil.shape) == 4:
+    #         padding_mask = padding_mask.unsqueeze(1) # heads dimention
+    #         print(padding_mask)
+    #     fil *= padding_mask.unsqueeze(-1)
+    # fil = fil.unsqueeze(-1)
+    # fil = fil.tile((embed_dim))
+
+    # # tileing Q and K
+    # tile_Q = torch.tile(torch.unsqueeze(q,-3), (seq_len,1,1)).transpose(-2,-3)
+    # tile_K = torch.tile(torch.unsqueeze(k,-3), (seq_len,1,1))
+
+    # B = torch.sum(tile_Q * fil * tile_K, dim = -1) / (embed_dim ** 0.5)
+    # B = torch.where(fil.sum(dim=-1) == 0, torch.full_like(B, -float('inf')), B)
+    # print(B)
+
+    
+    # attention = torch.softmax(B, dim = -1) # softmax on rows
+    # attention = torch.where(attention.isnan(), torch.tensor(1/seq_len, dtype=attention.dtype), attention)
+
+    # values = attention @ v
     # ========================
 
 
