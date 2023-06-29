@@ -153,7 +153,15 @@ def part3_transformer_encoder_hyperparams():
 
     # TODO: Tweak the hyperparameters to train the transformer encoder.
     # ====== YOUR CODE: ======
-    
+    hypers = dict(
+        embed_dim = 48, 
+        num_heads = 4,
+        num_layers = 3,
+        hidden_dim = 128,
+        window_size = 80,
+        droupout = 0.1,
+        lr=0.001,
+    )
     # ========================
     return hypers
 
@@ -162,12 +170,12 @@ def part3_transformer_encoder_hyperparams():
 
 part3_q1 = r"""
 **Your answer:**
-
+When using sliding-window attention, each encoder layer focuses on a specific subset of the input data within a defined window. Stacking multiple layers effectively expands the contextual view, as each subsequent layer can refer to a combination of the previous layers' sliding-windows. This is similar to how stacked Convolutional Neural Network (CNN) layers increase their receptive field, or area of attention, for the input. Therefore, stacking these layers results in a broader context in the final layer.
 """
 
 part3_q2 = r"""
 **Your answer:**
-
+One proposed variation is "Random Sampling Attention". This involves, for each position in the sequence, attending to the fixed-size sliding window plus a fixed number of additional positions randomly sampled from the entire sequence. Attention scores are computed normally for these sampled positions while others are set to zero weight. This way, the model can consider both local (sliding window) and global (random samples) context, while keeping the computational complexity linear as in sliding-window attention.
 
 """
 

@@ -40,17 +40,17 @@ def sliding_window_attention(q, k, v, window_size, padding_mask=None):
     if len(q.shape) == 4:
         heads_dim = True
         num_heads = q.shape[1]
-        k = k.view((batch_size*num_heads, seq_len, embed_dim))
-        q = q.view((batch_size*num_heads, seq_len, embed_dim))
+        k = k.reshape((batch_size*num_heads, seq_len, embed_dim))
+        q = q.reshape((batch_size*num_heads, seq_len, embed_dim))
 
-    
-    pad = torch.zeros((batch_size*num_heads,window_size//2, embed_dim))
+    # creating strided q - contains n groups of queries when i'th group corresponds to i'th key's window-close neighbors 
+    pad = torch.zeros((batch_size*num_heads,window_size//2, embed_dim)).to(k.device)
     padded_q = torch.cat((pad,q,pad), dim = 1)
     stride = padded_q.stride()
     strided_q = padded_q.as_strided((batch_size*num_heads, seq_len, window_size+1, embed_dim), (stride[0], stride[1], stride[1], stride[2]))
 
     # fill B with -inf
-    B = torch.full((batch_size*num_heads, seq_len + window_size, seq_len + window_size), float('-inf')) # extra big
+    B = torch.full((batch_size*num_heads, seq_len + window_size, seq_len + window_size), -9e15).to(k.device) # extra big
 
     # T the B vaules we got from keys dot window-close queries. 
     T = (strided_q @ k.unsqueeze(-2).transpose(-1,-2)).squeeze(-1)
@@ -64,13 +64,20 @@ def sliding_window_attention(q, k, v, window_size, padding_mask=None):
 
     B[index] = T.flatten()
     B = B[:,window_size//2:-window_size//2,window_size//2:-window_size//2] # cut extra
+
+    # apply padding mask
+    if padding_mask != None:
+        padding_mask = padding_mask.reshape((batch_size,seq_len,1)).repeat((num_heads,1,seq_len))
+        B = torch.where(padding_mask == 0.0, -9e15, B.double()).float()
+        B = torch.where(padding_mask.transpose(-1,-2) == 0.0, -9e15, B.double()).float()
+    
     B /= embed_dim ** 0.5 # normalize
 
     # softmax B to get attention as usual
     attention = torch.softmax(B, dim = -1)
 
     if heads_dim == True:
-        attention = attention.view(batch_size, num_heads, seq_len, seq_len)
+        attention = attention.reshape((batch_size, num_heads, seq_len, seq_len))
 
     values = attention @ v
     
@@ -287,8 +294,12 @@ class Encoder(nn.Module):
         #  5) Apply the classification MLP to the output vector corresponding to the special token [CLS] 
         #     (always the first token) to receive the logits.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
-        
+        x1 = self.encoder_embedding(sentence)
+        x2 = self.positional_encoding(x1)
+        x = self.dropout(x2)
+        for i,layer in enumerate(self.encoder_layers):
+            x = layer(x, padding_mask)
+        output = self.classification_mlp(x[:,0,:])
         # ========================
         
         

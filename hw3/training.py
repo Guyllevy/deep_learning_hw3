@@ -115,7 +115,7 @@ class Trainer(abc.ABC):
                 epochs_without_improvement += 1
 
             # early stopping
-            if epochs_without_improvement > early_stopping:
+            if early_stopping != None and epochs_without_improvement > early_stopping:
                 break
 
             # ========================
@@ -373,7 +373,16 @@ class TransformerEncoderTrainer(Trainer):
         # TODO:
         #  fill out the training loop.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        y = self.model(input_ids, attention_mask).squeeze(-1)
+        pred = torch.where(y < 0.5, 0.0, 1.0)
+
+        loss = self.loss_fn(y, label)
+        num_correct = torch.where(pred == label, 1, 0).sum()
+
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+
         # ========================
         
         
@@ -392,7 +401,11 @@ class TransformerEncoderTrainer(Trainer):
             # TODO:
             #  fill out the testing loop.
             # ====== YOUR CODE: ======
-            raise NotImplementedError()
+            y = self.model(input_ids, attention_mask).squeeze(-1)
+            pred = torch.where(y < 0.5, 0.0, 1.0)
+    
+            loss = self.loss_fn(y, label)
+            num_correct = torch.where(pred == label, 1, 0).sum()
             # ========================
 
             
