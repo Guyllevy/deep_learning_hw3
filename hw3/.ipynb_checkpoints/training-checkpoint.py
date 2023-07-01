@@ -424,9 +424,19 @@ class FineTuningTrainer(Trainer):
         # TODO:
         #  fill out the training loop.
         # ====== YOUR CODE: ======
+        outputs = self.model(input_ids=input_ids, attention_mask=attention_masks, labels=labels)
+        loss = outputs.loss
+    
+        logits = outputs.logits
+        _, preds = torch.max(logits, dim=1)
+        num_correct = (preds == labels).sum()
 
-        raise NotImplementedError()
-        
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+
+        loss = loss.detach()
+        num_correct = num_correct.detach()
         # ========================
         
         return BatchResult(loss, num_correct)
@@ -441,6 +451,14 @@ class FineTuningTrainer(Trainer):
             # TODO:
             #  fill out the training loop.
             # ====== YOUR CODE: ======
-            raise NotImplementedError()
+            outputs = self.model(input_ids=input_ids, attention_mask=attention_masks, labels=labels)
+            loss = outputs.loss
+        
+            logits = outputs.logits
+            _, preds = torch.max(logits, dim=1)
+            num_correct = (preds == labels).sum()
+            
+            loss = loss.detach()
+            num_correct = num_correct.detach()
             # ========================
         return BatchResult(loss, num_correct)

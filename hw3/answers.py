@@ -182,13 +182,24 @@ One proposed variation is "Random Sampling Attention". This involves, for each p
 
 part4_q1 = r"""
 **Your answer:**
+In part 3 our own implementation achieved 74 precent accuracy on the test set.
+In part 4 fine-tuning the last 2 layers achieved 64 precent accuracy on the test set, and fine-tuning all the parameters achieved 87 precent on the test set.
+So the best results came from fine tuning all the parameters on the distil-bert model.
+As to why, pre-trained models, such as distil-bert, have learned general language representations from vast amounts of data, and these representations can capture a lot of useful information about language structure and semantics. By fine-tuning on a specific task, the model can refine these representations to align better with the task-specific data, resulting in improved performance.
+However, it might not always be the case, effectiveness of pre-training and fine-tuning may vary depending on the nature of the downstream task and the amount of labeled data available. In some cases, fine-tuning may not always lead to better performance compared to training from scratch, especially if the task's data distribution significantly differs from the pre-training data.
 
 
 """
 
 part4_q2 = r"""
+FIXED QUESTION ACCORDING TO PIAZZA FORUM:
+Assume that when fine-tuning, instead of freezing all the layers besides the last two linear layers, you instead left some other internal model layers unfrozen, such as the multi-headed attention blocks.
+Would the model still be able to succesfully fine-tune to this task?   
+Or would the results be worse?  
+Explain<br>
 **Your answer:**
-
+If we left some internal model layers unfrozen (such as the multi-headed attention blocks), in addition to the last 2 layers, I suspect the model would do better, as it will capture task-specific patterns and contextual information in the features given to the classifier.
+Though if we only left internal model layers such as the multi-headed attention blocks unforzen, without unfreezing the classifier linear layers, I suspect it will do worse, as the model wont fine-tune it's output as well as the other methods suggested.
 
 """
 
